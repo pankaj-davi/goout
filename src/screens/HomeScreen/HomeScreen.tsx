@@ -65,7 +65,7 @@ const App: React.FC = () => {
   return (
     <View style={styles.container}>
       <MapView
-        provider={PROVIDER_GOOGLE} // Remove if not using Google Maps
+        // provider={PROVIDER_GOOGLE} // Remove if not using Google Maps
         style={styles.map}
         region={{
           latitude: currentLocation?.latitude || 37.78825,

@@ -122,6 +122,8 @@ dependencies {
     implementation("com.facebook.react:react-android")
     implementation platform('com.google.firebase:firebase-bom') // Use the latest BOM version
     implementation 'com.google.firebase:firebase-firestore' // Firestore SDK
+    implementation project(':react-native-maps')
+    implementation 'com.google.android.gms:play-services-maps:17.0.0'
 
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")

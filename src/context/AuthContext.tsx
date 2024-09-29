@@ -21,7 +21,7 @@ interface GoogleUserInfo {
 
 interface AuthContextProps {
   isAuthenticated: boolean;
-  isAuthloading: boolean;
+  isAuthLoading: boolean;
   login: () => void;
   logout: () => void;
   user: IUser | null;
@@ -78,7 +78,7 @@ export const AuthProvider: React.FC<{children: ReactNode}> = ({children}) => {
 
   GoogleSignin.configure({
     webClientId:
-      '883572130459-u13r4chvsh1cknqa5ejrldcii655r51s.apps.googleusercontent.com',
+      '883572130459-8jefqiq170oji3r2s5fkiptf66g1mk0h.apps.googleusercontent.com',
   });
 
   const saveUserDataToFirestore = async (userData: CustomUser) => {
