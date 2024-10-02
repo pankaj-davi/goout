@@ -1,4 +1,4 @@
-import { FIRE_BASE_CLIENT_ID } from 'react-native-dotenv';
+// import { FIRE_BASE_CLIENT_ID } from 'react-native-dotenv';
 import React, {
   createContext,
   useState,
@@ -80,7 +80,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   }, []);
 
   GoogleSignin.configure({
-    webClientId: FIRE_BASE_CLIENT_ID,
+    webClientId: '',
   });
 
   const saveUserDataToFirestore = async (userData: CustomUser) => {
