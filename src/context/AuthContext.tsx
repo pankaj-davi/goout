@@ -14,6 +14,7 @@ import {
   statusCodes,
   SignInResponse,
 } from '@react-native-google-signin/google-signin';
+import { FIRE_BASE_CLIENT_ID } from '@env';
 
 interface GoogleUserInfo {
   idToken?: string;
@@ -80,7 +81,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   }, []);
 
   GoogleSignin.configure({
-    webClientId: '',
+    webClientId: FIRE_BASE_CLIENT_ID,
   });
 
   const saveUserDataToFirestore = async (userData: CustomUser) => {

@@ -29,8 +29,7 @@ const DrawerNavigator: React.FC = () => {
   // Drawer icon renderer as a separate function for reusability
   const renderDrawerIcon = useCallback(
     (name: string) =>
-      ({ color, size }: any) =>
-        <Icon name={name} color={color} size={size} />,
+      ({ color, size }: any) => <Icon name={name} color={color} size={size} />,
     []
   );
 

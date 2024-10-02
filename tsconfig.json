@@ -1,6 +1,18 @@
 {
   "compilerOptions": {
-    "jsx": "react"
+    "jsx": "react",
+    "target": "esnext", // Use 'esnext' or 'es2015' or later
+    "module": "esnext", // Set module to 'esnext' for modern module support
+    "strict": true, // Enable all strict type-checking options
+    "esModuleInterop": true, // Enables emit interoperability between CommonJS and ES Modules
+    "skipLibCheck": true, // Skip type checking of declaration files
+    "forceConsistentCasingInFileNames": true, // Disallow inconsistently-cased references to the same file
+    "baseUrl": "./" // Base directory to resolve non-relative module names
   },
-  "extends": "@react-native/typescript-config/tsconfig.json"
+  "extends": "@react-native/typescript-config/tsconfig.json", // Extend from the React Native base config
+  "include": [
+    "src/**/*", // Include all TypeScript files in the src directory
+    "@types/**/*", // Include any custom type declarations
+    "./env.d.ts" // Ensure this file exists and is correctly placed
+  ]
 }
