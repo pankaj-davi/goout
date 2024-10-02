@@ -3050,7 +3050,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-native/assets-registry@npm:0.75.3, @react-native/assets-registry@npm:^0.75.3":
+"@react-native/assets-registry@npm:0.75.3":
   version: 0.75.3
   resolution: "@react-native/assets-registry@npm:0.75.3"
   checksum: 7e1fec31d442407a4a777d40b8f9d253e0dbecfdd112624772a861182e5818b6a4751f0c2818179357f6f4caa223470159d8528b04ab7261807f77b01b263ad8
@@ -3185,7 +3185,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-native/eslint-config@npm:0.75.3":
+"@react-native/eslint-config@npm:^0.75.3":
   version: 0.75.3
   resolution: "@react-native/eslint-config@npm:0.75.3"
   dependencies:
@@ -3286,23 +3286,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-navigation/bottom-tabs@npm:^6.6.1":
-  version: 6.6.1
-  resolution: "@react-navigation/bottom-tabs@npm:6.6.1"
-  dependencies:
-    "@react-navigation/elements": ^1.3.31
-    color: ^4.2.3
-    warn-once: ^0.1.0
-  peerDependencies:
-    "@react-navigation/native": ^6.0.0
-    react: "*"
-    react-native: "*"
-    react-native-safe-area-context: ">= 3.0.0"
-    react-native-screens: ">= 3.0.0"
-  checksum: 07d6da4b91d7f372b67bcb9f1ff97fba96f1fe226bd95d43d7877362ce71d99c6eebe9ca41d84ea8828f055713386262e089a8207a6c849f33bae49b4df4b196
-  languageName: node
-  linkType: hard
-
 "@react-navigation/core@npm:^6.4.17":
   version: 6.4.17
   resolution: "@react-navigation/core@npm:6.4.17"
@@ -3387,24 +3370,6 @@ __metadata:
   dependencies:
     nanoid: ^3.1.23
   checksum: 3a3392ce095d6a2bd2aad69856f513b35774f943a3dc73d8ffb75127de6773203e3264188d87058bdea4c0c9a7d43ed28d0cbf3a1f1cdc086df3ee255d8e1e27
-  languageName: node
-  linkType: hard
-
-"@react-navigation/stack@npm:^6.4.1":
-  version: 6.4.1
-  resolution: "@react-navigation/stack@npm:6.4.1"
-  dependencies:
-    "@react-navigation/elements": ^1.3.31
-    color: ^4.2.3
-    warn-once: ^0.1.0
-  peerDependencies:
-    "@react-navigation/native": ^6.0.0
-    react: "*"
-    react-native: "*"
-    react-native-gesture-handler: ">= 1.0.0"
-    react-native-safe-area-context: ">= 3.0.0"
-    react-native-screens: ">= 3.0.0"
-  checksum: 09bcfb001db0f411df881da9f2551b7015c4d5259a77fcb93196de308838035d016dc4dcb654d16d9cd4cc99f09f5e48add796aa903f9a253678947c35b18199
   languageName: node
   linkType: hard
 
@@ -4019,28 +3984,24 @@ __metadata:
     "@react-native-firebase/auth": ^20.5.0
     "@react-native-firebase/firestore": ^20.5.0
     "@react-native-google-signin/google-signin": ^13.1.0
-    "@react-native/assets-registry": ^0.75.3
     "@react-native/babel-preset": 0.75.3
-    "@react-native/eslint-config": 0.75.3
+    "@react-native/eslint-config": ^0.75.3
     "@react-native/metro-config": 0.75.3
     "@react-native/typescript-config": 0.75.3
-    "@react-navigation/bottom-tabs": ^6.6.1
     "@react-navigation/drawer": ^6.7.2
-    "@react-navigation/elements": ^1.3.31
     "@react-navigation/native": ^6.1.18
     "@react-navigation/native-stack": ^6.11.0
-    "@react-navigation/stack": ^6.4.1
     "@types/react": ^18.3.8
     "@types/react-native": ^0.73.0
     "@types/react-native-vector-icons": ^6.4.18
     "@types/react-test-renderer": ^18.0.0
     babel-jest: ^29.6.3
-    babel-plugin-module-resolver: ^5.0.2
     eslint: ^9.11.1
     eslint-config-prettier: ^9.1.0
+    eslint-define-config: ^2.1.0
     eslint-plugin-prettier: ^5.2.1
-    husky: ^9.1.6
-    invariant: ^2.2.4
+    globals: ^15.10.0
+    husky: latest
     jest: ^29.6.3
     metro-react-native-babel-preset: ^0.77.0
     prettier: ^3.3.3
@@ -4433,19 +4394,6 @@ __metadata:
     "@types/babel__core": ^7.1.14
     "@types/babel__traverse": ^7.0.6
   checksum: 51250f22815a7318f17214a9d44650ba89551e6d4f47a2dc259128428324b52f5a73979d010cefd921fd5a720d8c1d55ad74ff601cd94c7bd44d5f6292fde2d1
-  languageName: node
-  linkType: hard
-
-"babel-plugin-module-resolver@npm:^5.0.2":
-  version: 5.0.2
-  resolution: "babel-plugin-module-resolver@npm:5.0.2"
-  dependencies:
-    find-babel-config: ^2.1.1
-    glob: ^9.3.3
-    pkg-up: ^3.1.0
-    reselect: ^4.1.7
-    resolve: ^1.22.8
-  checksum: f1d198acbbbd0b76c9c0c4aacbf9f1ef90f8d36b3d5209d9e7a75cadee2113a73711550ebddeb9464d143b71df19adc75e165dff99ada2614d7ea333affe3b5a
   languageName: node
   linkType: hard
 
@@ -5760,6 +5708,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"eslint-define-config@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "eslint-define-config@npm:2.1.0"
+  checksum: ea6fe1af5fb198f4910a03887248b55f5874fac8b82bf7d831276ed587e635e513c24b2a4c3e255656f41ff550267ab13dde61e2f9ee7a665ee4783593d95e34
+  languageName: node
+  linkType: hard
+
 "eslint-plugin-eslint-comments@npm:^3.2.0":
   version: 3.2.0
   resolution: "eslint-plugin-eslint-comments@npm:3.2.0"
@@ -6208,15 +6163,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"find-babel-config@npm:^2.1.1":
-  version: 2.1.2
-  resolution: "find-babel-config@npm:2.1.2"
-  dependencies:
-    json5: ^2.2.3
-  checksum: 268f29cb38ee086b0f953c89f762dcea30b5b0e14abee2b39516410c00b49baa6821f598bd50346c93584e5625c5740f5c8b7e34993f568787a068f84dacc8c2
-  languageName: node
-  linkType: hard
-
 "find-cache-dir@npm:^2.0.0":
   version: 2.1.0
   resolution: "find-cache-dir@npm:2.1.0"
@@ -6553,18 +6499,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"glob@npm:^9.3.3":
-  version: 9.3.5
-  resolution: "glob@npm:9.3.5"
-  dependencies:
-    fs.realpath: ^1.0.0
-    minimatch: ^8.0.2
-    minipass: ^4.2.4
-    path-scurry: ^1.6.1
-  checksum: 94b093adbc591bc36b582f77927d1fb0dbf3ccc231828512b017601408be98d1fe798fc8c0b19c6f2d1a7660339c3502ce698de475e9d938ccbb69b47b647c84
-  languageName: node
-  linkType: hard
-
 "globals@npm:^11.1.0":
   version: 11.12.0
   resolution: "globals@npm:11.12.0"
@@ -6576,6 +6510,13 @@ __metadata:
   version: 14.0.0
   resolution: "globals@npm:14.0.0"
   checksum: 534b8216736a5425737f59f6e6a5c7f386254560c9f41d24a9227d60ee3ad4a9e82c5b85def0e212e9d92162f83a92544be4c7fd4c902cb913736c10e08237ac
+  languageName: node
+  linkType: hard
+
+"globals@npm:^15.10.0":
+  version: 15.10.0
+  resolution: "globals@npm:15.10.0"
+  checksum: c6b7d1b3e74a830005e248c2a2b26a0c4b0d40460dbd3b2b1badbee13fadf6e735f7ea6c232e48fbef6beb4b4eac0d3530d9d89e31d6f629ac27e755d42d4872
   languageName: node
   linkType: hard
 
@@ -6790,7 +6731,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"husky@npm:^9.1.6":
+"husky@npm:latest":
   version: 9.1.6
   resolution: "husky@npm:9.1.6"
   bin:
@@ -8666,15 +8607,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"minimatch@npm:^8.0.2":
-  version: 8.0.4
-  resolution: "minimatch@npm:8.0.4"
-  dependencies:
-    brace-expansion: ^2.0.1
-  checksum: 2e46cffb86bacbc524ad45a6426f338920c529dd13f3a732cc2cf7618988ee1aae88df4ca28983285aca9e0f45222019ac2d14ebd17c1edadd2ee12221ab801a
-  languageName: node
-  linkType: hard
-
 "minimatch@npm:^9.0.4":
   version: 9.0.5
   resolution: "minimatch@npm:9.0.5"
@@ -8748,13 +8680,6 @@ __metadata:
   dependencies:
     yallist: ^4.0.0
   checksum: a30d083c8054cee83cdcdc97f97e4641a3f58ae743970457b1489ce38ee1167b3aaf7d815cd39ec7a99b9c40397fd4f686e83750e73e652b21cb516f6d845e48
-  languageName: node
-  linkType: hard
-
-"minipass@npm:^4.2.4":
-  version: 4.2.8
-  resolution: "minipass@npm:4.2.8"
-  checksum: 7f4914d5295a9a30807cae5227a37a926e6d910c03f315930fde52332cf0575dfbc20295318f91f0baf0e6bb11a6f668e30cde8027dea7a11b9d159867a3c830
   languageName: node
   linkType: hard
 
@@ -9311,7 +9236,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"path-scurry@npm:^1.11.1, path-scurry@npm:^1.6.1":
+"path-scurry@npm:^1.11.1":
   version: 1.11.1
   resolution: "path-scurry@npm:1.11.1"
   dependencies:
@@ -9371,15 +9296,6 @@ __metadata:
   dependencies:
     find-up: ^4.0.0
   checksum: 9863e3f35132bf99ae1636d31ff1e1e3501251d480336edb1c211133c8d58906bed80f154a1d723652df1fda91e01c7442c2eeaf9dc83157c7ae89087e43c8d6
-  languageName: node
-  linkType: hard
-
-"pkg-up@npm:^3.1.0":
-  version: 3.1.0
-  resolution: "pkg-up@npm:3.1.0"
-  dependencies:
-    find-up: ^3.0.0
-  checksum: 5bac346b7c7c903613c057ae3ab722f320716199d753f4a7d053d38f2b5955460f3e6ab73b4762c62fd3e947f58e04f1343e92089e7bb6091c90877406fcd8c8
   languageName: node
   linkType: hard
 
@@ -9997,13 +9913,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"reselect@npm:^4.1.7":
-  version: 4.1.8
-  resolution: "reselect@npm:4.1.8"
-  checksum: a4ac87cedab198769a29be92bc221c32da76cfdad6911eda67b4d3e7136dca86208c3b210e31632eae31ebd2cded18596f0dd230d3ccc9e978df22f233b5583e
-  languageName: node
-  linkType: hard
-
 "resolve-cwd@npm:^3.0.0":
   version: 3.0.0
   resolution: "resolve-cwd@npm:3.0.0"
@@ -10041,7 +9950,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"resolve@npm:^1.14.2, resolve@npm:^1.20.0, resolve@npm:^1.22.8":
+"resolve@npm:^1.14.2, resolve@npm:^1.20.0":
   version: 1.22.8
   resolution: "resolve@npm:1.22.8"
   dependencies:
@@ -10067,7 +9976,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"resolve@patch:resolve@^1.14.2#~builtin<compat/resolve>, resolve@patch:resolve@^1.20.0#~builtin<compat/resolve>, resolve@patch:resolve@^1.22.8#~builtin<compat/resolve>":
+"resolve@patch:resolve@^1.14.2#~builtin<compat/resolve>, resolve@patch:resolve@^1.20.0#~builtin<compat/resolve>":
   version: 1.22.8
   resolution: "resolve@patch:resolve@npm%3A1.22.8#~builtin<compat/resolve>::version=1.22.8&hash=c3c19d"
   dependencies:
