@@ -26,7 +26,7 @@ interface AuthContextProps {
   isAuthLoading: boolean;
   login: () => void;
   logout: () => void;
-  user: IUser | null;
+  user: IUser;
 }
 
 interface IUser {
