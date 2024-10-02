@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/husky.sh"
+
+# Your pre-push commands here (if any)

@@ -1,10 +1,10 @@
-
-import React, {useState, useEffect} from 'react';
-import {StyleSheet, View, Alert, Image} from 'react-native';
-import MapView, {PROVIDER_GOOGLE, Marker} from 'react-native-maps';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, Alert, Image } from 'react-native';
+import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
-import {useAuth} from '../../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import firestore from '@react-native-firebase/firestore';
+import DrawerButton from '../../Components/DrawerButton/DrawerButton';
 
 interface GeoPoint {
   latitude: number;
@@ -34,9 +34,22 @@ const styles = StyleSheet.create({
   markerImage: {
     width: 50,
     height: 50,
-    borderRadius: 25,
+    borderRadius: 25, // Circular shape
     borderWidth: 2,
     borderColor: 'white',
+    backgroundColor: 'black', // Fill color for the pin
+    position: 'relative',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    // Add shadow for a 3D effect (optional)
+    shadowColor: 'rgba(0, 0, 0, 0.3)',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 2,
   },
   currentUserMarker: {
     borderColor: 'blue', // Color for the current user's marker
@@ -46,32 +59,33 @@ const styles = StyleSheet.create({
   },
 });
 
-const App: React.FC = () => {
-  const {user , logout} = useAuth();
+const App: React.FC<{ navigation: any }> = ({ navigation }) => {
+  const { user } = useAuth();
   const [allUsers, setAllUsers] = useState<any[]>([]);
   const [currentLocation, setCurrentLocation] = useState<GeoPoint | null>(null);
+
   // Function to update user's current location
   const updateLocation = (latitude: number, longitude: number) => {
-    console.log({latitude, longitude});
-    setCurrentLocation({latitude, longitude});
+    console.log({ latitude, longitude });
+    setCurrentLocation({ latitude, longitude });
     saveUserLocation(latitude, longitude);
   };
 
   // Function to get current position
   const getCurrentPosition = () => {
     Geolocation.getCurrentPosition(
-      position => {
-        const {latitude, longitude} = position.coords;
+      (position) => {
+        const { latitude, longitude } = position.coords;
         updateLocation(latitude, longitude);
       },
-      error => {
+      (error) => {
         console.error(error);
         Alert.alert(
           'Error',
-          'Unable to get current location. Please try again later.',
+          'Unable to get current location. Please try again later.'
         );
       },
-      {enableHighAccuracy: true},
+      { enableHighAccuracy: true }
     );
   };
 
@@ -81,7 +95,7 @@ const App: React.FC = () => {
       const usersSnapshot = await firestore()
         .collection('userWithLocation') // Ensure this matches your Firestore collection
         .get();
-      const usersWithLocation = usersSnapshot.docs.map(doc => {
+      const usersWithLocation = usersSnapshot.docs.map((doc) => {
         const data = doc.data();
         return {
           uid: doc.id,
@@ -115,7 +129,7 @@ const App: React.FC = () => {
               longitude,
             },
           });
-          console.log('User details saved successfully' , user);
+          console.log('User details saved successfully', user);
         } else {
           await userDocRef.update({
             location: {
@@ -132,26 +146,14 @@ const App: React.FC = () => {
   };
 
   useEffect(() => {
-    console.log(user , "RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR")
-  } , [])
-
-  useEffect(() => {
     // Get initial position
-    getCurrentPosition(); // Get the initial position
-    fetchAllUsersWithLocation(); // Fetch users only once on mount
-
-    // Set an interval to update the location every 5 minutes
-    // const intervalId = setInterval(() => {
-    //   getCurrentPosition();
-    // }, 5 * 60 * 1000); // 5 minutes in milliseconds
-
-    // // Clear the interval on unmount
-    // return () => clearInterval(intervalId);
+    // getCurrentPosition(); // Get the initial position
+    // fetchAllUsersWithLocation(); // Fetch users only once on mount
   }, []); // Empty dependency array means this runs once when the component mounts
-
 
   return (
     <View style={styles.container}>
+      <DrawerButton navigation={navigation} userPhoto={user!.photo!} />
       <MapView
         provider={PROVIDER_GOOGLE}
         style={styles.map}
@@ -160,8 +162,8 @@ const App: React.FC = () => {
           longitude: currentLocation?.longitude || -122.4324,
           latitudeDelta: 0.015,
           longitudeDelta: 0.0121,
-        }}>
-       
+        }}
+      >
         {currentLocation && (
           <Marker coordinate={currentLocation}>
             <View style={[styles.markerContainer, styles.currentUserMarker]}>
@@ -177,18 +179,19 @@ const App: React.FC = () => {
             </View>
           </Marker>
         )}
-    
-        {allUsers.map(otherUser => {
-          const {location, photo, uid} = otherUser;
+
+        {allUsers.map((otherUser) => {
+          const { location, photo, uid } = otherUser;
           if (location && location.latitude && location.longitude) {
             // Show all users without distance logic
             return (
               <Marker
                 key={uid}
                 coordinate={{
-                latitude: currentLocation?.latitude || 37.78825,
-          longitude: currentLocation?.longitude || -122.4324,
-                }}>
+                  latitude: location.latitude,
+                  longitude: location.longitude,
+                }}
+              >
                 <View style={[styles.markerContainer, styles.otherUserMarker]}>
                   <View style={styles.markerPin}>
                     <Image
@@ -227,7 +230,7 @@ const App: React.FC = () => {
 //   const deltaLon = toRad(point2.longitude - point1.longitude);
 
 //   const a =
-//     Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
+//     Math.sin(deltadLat / 2) * Math.sin(deltaLat / 2) +
 //     Math.cos(lat1) *
 //       Math.cos(lat2) *
 //       Math.sin(deltaLon / 2) *

@@ -1,44 +1,15 @@
-// App.tsx
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import 'react-native-gesture-handler';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 import LoginScreen from './src/screens/LoginScreen/LoginScreen';
-import HomeScreen from './src/screens/HomeScreen/HomeScreen';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { createDrawerNavigator } from '@react-navigation/drawer';
-import { ActivityIndicator, View, StyleSheet, TouchableOpacity } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons'; // Make sure this import is correct
+import { ActivityIndicator, View, StyleSheet } from 'react-native';
+import DrawerNavigator from './src/navigation/DrawerNavigator'; // Import DrawerNavigator
 
 const Stack = createNativeStackNavigator();
-const Drawer = createDrawerNavigator();
 
-function DrawerButton({ navigation }: { navigation: any }) {
-  return (
-    <TouchableOpacity onPress={() => navigation.openDrawer()}>
-      <Ionicons name="menu" size={24} color="black" style={{ marginLeft: 15 }} />
-    </TouchableOpacity>
-  );
-}
-
-// Define the Drawer Navigator
-function DrawerNavigator() {
-  return (
-    <Drawer.Navigator initialRouteName="Home">
-      <Drawer.Screen
-        name="Home"
-        component={HomeScreen}
-        options={({ navigation }) => ({
-          headerLeft: () => <DrawerButton navigation={navigation} />, // Ensure navigation prop is passed
-          headerTitle: '', // Remove header title
-          // headerStyle: { backgroundColor: 'transparent' }, // Make the header transparent
-        })}
-      />
-    </Drawer.Navigator>
-  );
-}
-
-function MainApp() {
+const MainApp: React.FC = () => {
   const { isAuthenticated, isAuthLoading } = useAuth();
 
   if (isAuthLoading) {
@@ -56,7 +27,7 @@ function MainApp() {
           <Stack.Screen
             name="Drawer"
             component={DrawerNavigator}
-            options={{ headerShown: false }} // Hide header for stack navigator
+            options={{ headerShown: false }}
           />
         ) : (
           <Stack.Screen name="Login" component={LoginScreen} />
@@ -64,7 +35,7 @@ function MainApp() {
       </Stack.Navigator>
     </NavigationContainer>
   );
-}
+};
 
 const styles = StyleSheet.create({
   loadingContainer: {
@@ -74,10 +45,12 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function App() {
+const App: React.FC = () => {
   return (
     <AuthProvider>
       <MainApp />
     </AuthProvider>
   );
-}
+};
+
+export default App;

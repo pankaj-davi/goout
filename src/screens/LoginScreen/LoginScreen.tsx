@@ -1,11 +1,11 @@
 // screens/LoginScreen.tsx
 import React from 'react';
-import {Button, View, Text, StyleSheet} from 'react-native';
+import { Button, View, Text, StyleSheet } from 'react-native';
 import LogoIcon from '../../assets/logo-icon.svg';
-import {useAuth} from '../../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 
 const LoginScreen: React.FC = () => {
-  const {login} = useAuth();
+  const { login } = useAuth();
 
   return (
     <View style={styles.container}>

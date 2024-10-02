@@ -1,3 +1,4 @@
+import { FIRE_BASE_CLIENT_ID } from 'react-native-dotenv';
 import React, {
   createContext,
   useState,
@@ -47,7 +48,9 @@ interface CustomUser {
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
-export const AuthProvider: React.FC<{children: ReactNode}> = ({children}) => {
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isAuthLoading, setIsAuthLoading] = useState<boolean>(true);
   const [user, setUser] = useState<IUser | null>(null);
@@ -69,7 +72,7 @@ export const AuthProvider: React.FC<{children: ReactNode}> = ({children}) => {
 
     checkUserStatus();
 
-    const unsubscribe = auth().onAuthStateChanged(user => {
+    const unsubscribe = auth().onAuthStateChanged((user) => {
       setIsAuthenticated(!!user);
     });
 
@@ -77,8 +80,7 @@ export const AuthProvider: React.FC<{children: ReactNode}> = ({children}) => {
   }, []);
 
   GoogleSignin.configure({
-    webClientId:
-      '883572130459-8jefqiq170oji3r2s5fkiptf66g1mk0h.apps.googleusercontent.com',
+    webClientId: FIRE_BASE_CLIENT_ID,
   });
 
   const saveUserDataToFirestore = async (userData: CustomUser) => {
@@ -96,7 +98,7 @@ export const AuthProvider: React.FC<{children: ReactNode}> = ({children}) => {
       await firestore()
         .collection('users')
         .doc(userData.uid)
-        .set(userDoc, {merge: true});
+        .set(userDoc, { merge: true });
       console.log('User data saved to Firestore successfully');
     } catch (err) {
       console.error('Error saving user data to Firestore:', err);
@@ -114,18 +116,19 @@ export const AuthProvider: React.FC<{children: ReactNode}> = ({children}) => {
   const login = async () => {
     setIsAuthLoading(true);
     try {
-      await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
+      await GoogleSignin.hasPlayServices({
+        showPlayServicesUpdateDialog: true,
+      });
       const userInfo: SignInResponse = await GoogleSignin.signIn();
-      const {idToken} = userInfo.data as GoogleUserInfo;
+      const { idToken } = userInfo.data as GoogleUserInfo;
 
       if (!idToken) {
         throw new Error('Failed to get ID token');
       }
 
       const googleCredential = auth.GoogleAuthProvider.credential(idToken);
-      const userCredential = await auth().signInWithCredential(
-        googleCredential,
-      );
+      const userCredential =
+        await auth().signInWithCredential(googleCredential);
       const userData = userCredential.user as CustomUser;
 
       const userInfoToStore: IUser = {
@@ -173,14 +176,15 @@ export const AuthProvider: React.FC<{children: ReactNode}> = ({children}) => {
     } catch (error) {
       console.error(
         'Logout Error:',
-        error instanceof Error ? error.message : error,
+        error instanceof Error ? error.message : error
       );
     }
   };
 
   return (
     <AuthContext.Provider
-      value={{isAuthenticated, isAuthLoading, login, logout, user}}>
+      value={{ isAuthenticated, isAuthLoading, login, logout, user }}
+    >
       {children}
     </AuthContext.Provider>
   );
