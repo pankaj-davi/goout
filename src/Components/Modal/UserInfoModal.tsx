@@ -8,10 +8,16 @@ import {
   StyleSheet,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons'; // Importing Ionicons from react-native-vector-icons
+import firestore from '@react-native-firebase/firestore';
+import notificationUtils from '../notificationUtils/notificationUtils'; // Import notification utility
 
 interface UserInfoModalProps {
   visible: boolean;
-  user: {
+  currentUser: {
+    uid: string;
+  };
+  friendSeletedUser: {
+    uid: string;
     name: string;
     photo: string;
     location: {
@@ -26,11 +32,50 @@ interface UserInfoModalProps {
 
 const UserInfoModal: React.FC<UserInfoModalProps> = ({
   visible,
-  user,
+  currentUser,
+  friendSeletedUser,
   onClose,
   onSendRequest,
   onMoreInfo,
 }) => {
+  // Add a friend to the current user’s friends list
+  const addFriend = async (currentUserId: string, friendId: string) => {
+    try {
+      // Reference to the current user's document
+      const userRef = firestore().collection('users').doc(currentUserId);
+      const friendRef = firestore().collection('users').doc(friendId); // Reference to the friend's document
+
+      // Add friend's ID to the friends subcollection
+      await userRef
+        .collection('friends')
+        .doc(friendId)
+        .set({
+          ...friendSeletedUser,
+          friendId: friendId,
+          addedAt: firestore.FieldValue.serverTimestamp(), // Optional: Track when the friend was added
+        });
+
+      // Retrieve the friend's device token
+      const friendDoc = await friendRef.get();
+      if (friendDoc.exists) {
+        const friendData = friendDoc.data();
+        const friendDeviceToken = friendData?.deviceToken; // Assuming deviceToken is stored in the friend's data
+
+        // Trigger notification to the friend
+        if (friendDeviceToken) {
+          const title = `${currentUser.uid} sent you a friend request!`;
+          const body = `You have received a friend request from ${friendSeletedUser?.name}.`;
+          await notificationUtils.showNotification(title, body);
+        }
+      }
+
+      onClose();
+      console.log('Friend added successfully!');
+    } catch (error) {
+      console.error('Error adding friend: ', error);
+    }
+  };
+
   return (
     <Modal
       transparent={true}
@@ -45,16 +90,28 @@ const UserInfoModal: React.FC<UserInfoModalProps> = ({
             <Icon name="close" size={24} color="black" />
           </TouchableOpacity>
 
-          {user && (
+          {friendSeletedUser && (
             <>
-              <Image source={{ uri: user.photo }} style={styles.modalImage} />
-              <Text style={styles.modalText}>Name: {user.name}</Text>
+              <Image
+                source={{ uri: friendSeletedUser.photo }}
+                style={styles.modalImage}
+              />
+              <Text style={styles.modalText}>
+                Name: {friendSeletedUser.name}
+              </Text>
               <View style={styles.buttonContainer}>
                 <TouchableOpacity
                   onPress={onSendRequest}
                   style={styles.primaryButton}
                 >
-                  <Text style={styles.buttonText}>Send Request</Text>
+                  <Text
+                    style={styles.buttonText}
+                    onPress={() =>
+                      addFriend(currentUser.uid, friendSeletedUser.uid)
+                    }
+                  >
+                    Send Request
+                  </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={onMoreInfo}

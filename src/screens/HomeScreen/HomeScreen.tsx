@@ -72,7 +72,7 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const [allUsers, setAllUsers] = useState<User[]>([]);
   const [currentLocation, setCurrentLocation] = useState<GeoPoint | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [friendSeletedUser, setSeletedFriendUser] = useState<User | null>(null);
 
   // Function to update user's current location
   const updateLocation = (latitude: number, longitude: number) => {
@@ -160,6 +160,11 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     fetchAllUsersWithLocation(); // Fetch users only once on mount
   }, []);
 
+  const resetModal = () => {
+    setModalVisible(false);
+    setSeletedFriendUser(null);
+  };
+
   return (
     <View style={styles.container}>
       <DrawerButton navigation={navigation} userPhoto={user!.photo!} />
@@ -203,7 +208,7 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                   longitude: location.longitude,
                 }}
                 onPress={() => {
-                  setSelectedUser(otherUser);
+                  setSeletedFriendUser(otherUser);
                   setModalVisible(true);
                 }}
               >
@@ -227,11 +232,9 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       {/* User Info Modal */}
       <UserInfoModal
         visible={modalVisible}
-        user={selectedUser}
-        onClose={() => {
-          setModalVisible(false);
-          setSelectedUser(null);
-        }}
+        currentUser={user}
+        friendSeletedUser={friendSeletedUser}
+        onClose={resetModal}
         onSendRequest={() => console.log('Send request pressed')}
         onMoreInfo={() => console.log('More info pressed')}
       />
