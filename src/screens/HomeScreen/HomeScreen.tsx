@@ -5,10 +5,18 @@ import Geolocation from '@react-native-community/geolocation';
 import { useAuth } from '../../context/AuthContext';
 import firestore from '@react-native-firebase/firestore';
 import DrawerButton from '../../Components/DrawerButton/DrawerButton';
+import UserInfoModal from '../../Components/Modal/UserInfoModal'; // Adjust the path as necessary
 
 interface GeoPoint {
   latitude: number;
   longitude: number;
+}
+
+interface User {
+  uid: string;
+  name: string;
+  photo: string;
+  location: GeoPoint;
 }
 
 const styles = StyleSheet.create({
@@ -32,9 +40,9 @@ const styles = StyleSheet.create({
     paddingBottom: 5,
   },
   markerImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25, // Circular shape
+    width: 40,
+    height: 40,
+    borderRadius: 20, // Circular shape
     borderWidth: 2,
     borderColor: 'white',
     backgroundColor: 'black', // Fill color for the pin
@@ -59,10 +67,12 @@ const styles = StyleSheet.create({
   },
 });
 
-const App: React.FC<{ navigation: any }> = ({ navigation }) => {
+const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const { user } = useAuth();
-  const [allUsers, setAllUsers] = useState<any[]>([]);
+  const [allUsers, setAllUsers] = useState<User[]>([]);
   const [currentLocation, setCurrentLocation] = useState<GeoPoint | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [friendSeletedUser, setSeletedFriendUser] = useState<User | null>(null);
 
   // Function to update user's current location
   const updateLocation = (latitude: number, longitude: number) => {
@@ -95,7 +105,7 @@ const App: React.FC<{ navigation: any }> = ({ navigation }) => {
       const usersSnapshot = await firestore()
         .collection('userWithLocation') // Ensure this matches your Firestore collection
         .get();
-      const usersWithLocation = usersSnapshot.docs.map((doc) => {
+      const usersWithLocation: User[] = usersSnapshot.docs.map((doc) => {
         const data = doc.data();
         return {
           uid: doc.id,
@@ -146,10 +156,14 @@ const App: React.FC<{ navigation: any }> = ({ navigation }) => {
   };
 
   useEffect(() => {
-    // Get initial position
-    // getCurrentPosition(); // Get the initial position
-    // fetchAllUsersWithLocation(); // Fetch users only once on mount
-  }, []); // Empty dependency array means this runs once when the component mounts
+    getCurrentPosition(); // Get the initial position
+    fetchAllUsersWithLocation(); // Fetch users only once on mount
+  }, []);
+
+  const resetModal = () => {
+    setModalVisible(false);
+    setSeletedFriendUser(null);
+  };
 
   return (
     <View style={styles.container}>
@@ -170,8 +184,7 @@ const App: React.FC<{ navigation: any }> = ({ navigation }) => {
               <View style={styles.markerPin}>
                 <Image
                   source={{
-                    uri:
-                      user?.photo || 'https://example.com/default-avatar.png',
+                    uri: user!?.photo!,
                   }}
                   style={styles.markerImage}
                 />
@@ -182,8 +195,11 @@ const App: React.FC<{ navigation: any }> = ({ navigation }) => {
 
         {allUsers.map((otherUser) => {
           const { location, photo, uid } = otherUser;
+          console.log(
+            otherUser,
+            'otherUserotherUserotherUserotherUserotherUser'
+          );
           if (location && location.latitude && location.longitude) {
-            // Show all users without distance logic
             return (
               <Marker
                 key={uid}
@@ -191,12 +207,16 @@ const App: React.FC<{ navigation: any }> = ({ navigation }) => {
                   latitude: location.latitude,
                   longitude: location.longitude,
                 }}
+                onPress={() => {
+                  setSeletedFriendUser(otherUser);
+                  setModalVisible(true);
+                }}
               >
                 <View style={[styles.markerContainer, styles.otherUserMarker]}>
                   <View style={styles.markerPin}>
                     <Image
                       source={{
-                        uri: photo || 'https://example.com/default-avatar.png',
+                        uri: photo,
                       }}
                       style={styles.markerImage}
                     />
@@ -208,6 +228,16 @@ const App: React.FC<{ navigation: any }> = ({ navigation }) => {
           return null;
         })}
       </MapView>
+
+      {/* User Info Modal */}
+      <UserInfoModal
+        visible={modalVisible}
+        currentUser={user}
+        friendSeletedUser={friendSeletedUser}
+        onClose={resetModal}
+        onSendRequest={() => console.log('Send request pressed')}
+        onMoreInfo={() => console.log('More info pressed')}
+      />
     </View>
   );
 };
@@ -230,7 +260,7 @@ const App: React.FC<{ navigation: any }> = ({ navigation }) => {
 //   const deltaLon = toRad(point2.longitude - point1.longitude);
 
 //   const a =
-//     Math.sin(deltadLat / 2) * Math.sin(deltaLat / 2) +
+//     Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
 //     Math.cos(lat1) *
 //       Math.cos(lat2) *
 //       Math.sin(deltaLon / 2) *
@@ -241,4 +271,4 @@ const App: React.FC<{ navigation: any }> = ({ navigation }) => {
 //   return R * c; // Distance in meters
 // };
 
-export default App;
+export default HomeScreen;

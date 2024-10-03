@@ -29,8 +29,8 @@ interface AuthContextProps {
   user: IUser;
 }
 
-interface IUser {
-  id: string;
+export interface IUser {
+  uid: string;
   name: string | null;
   email: string;
   photo: string | null;
@@ -39,10 +39,10 @@ interface IUser {
 }
 
 interface CustomUser {
+  uid: string;
   displayName: string | null;
   email: string | null;
   photoURL: string | null;
-  uid: string;
   familyName?: string | null;
   givenName?: string | null;
 }
@@ -123,45 +123,47 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       const userInfo: SignInResponse = await GoogleSignin.signIn();
       const { idToken } = userInfo.data as GoogleUserInfo;
 
-      if (!idToken) {
-        throw new Error('Failed to get ID token');
-      }
+      if (!idToken) throw new Error('Failed to get ID token');
 
       const googleCredential = auth.GoogleAuthProvider.credential(idToken);
       const userCredential =
         await auth().signInWithCredential(googleCredential);
-      const userData = userCredential.user as CustomUser;
 
-      const userInfoToStore: IUser = {
-        id: userData.uid,
-        name: userData.displayName,
-        email: userData.email || '',
-        photo: userData.photoURL,
-        familyName: userData.familyName,
-        givenName: userData.givenName,
-      };
+      // Extract necessary details from the userCredential object
+      const { additionalUserInfo, user } = userCredential;
+      if (additionalUserInfo && additionalUserInfo.profile) {
+        const { profile } = additionalUserInfo;
 
-      setIsAuthenticated(true);
-      setUser(userInfoToStore);
-      await saveUserDataToStorage(userInfoToStore);
-      await saveUserDataToFirestore(userData);
+        // Mapping to the IUser interface for easy usage later
+        const userInfoToStore: IUser = {
+          uid: user.uid,
+          name: user.displayName || profile.given_name || null, // fallback to given_name if displayName is null
+          email: user.email || profile.email || '', // use the profile email as a fallback
+          photo: user.photoURL || profile.picture || null, // fallback to Google profile picture
+          familyName: profile.family_name || null, // optional
+          givenName: profile.given_name || null, // optional
+        };
+
+        // Set user and authentication state
+        setIsAuthenticated(true);
+        setUser(userInfoToStore);
+
+        // Save the user data to AsyncStorage and Firestore
+        await saveUserDataToStorage(userInfoToStore);
+        await saveUserDataToFirestore({
+          uid: user.uid,
+          displayName: user.displayName || profile.given_name,
+          email: user.email,
+          photoURL: user.photoURL,
+          familyName: profile.family_name,
+          givenName: profile.given_name,
+        });
+      }
 
       console.log('User signed in successfully');
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        switch (err.message) {
-          case statusCodes.SIGN_IN_CANCELLED:
-            console.error('User cancelled the sign-in');
-            break;
-          case statusCodes.IN_PROGRESS:
-            console.error('Sign-in in progress');
-            break;
-          default:
-            console.error('Google Sign-In Error:', err.message);
-        }
-      } else {
-        console.error('An unknown error occurred:', err);
-      }
+      console.log(err, 'User signed in errerrerr');
+      // handleError(err); // Reuse the error handler from earlier code
     } finally {
       setIsAuthLoading(false);
     }

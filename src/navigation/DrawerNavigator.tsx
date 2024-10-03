@@ -60,9 +60,6 @@ const DrawerNavigator: React.FC = () => {
         drawerStyle: {
           backgroundColor: '#f5f5f5',
         },
-        drawerLabelStyle: {
-          fontSize: 18,
-        },
       }}
     >
       {/* Home Screen */}
@@ -90,7 +87,7 @@ const DrawerNavigator: React.FC = () => {
         name="Received"
         component={ReceivedScreen}
         options={{
-          drawerIcon: renderDrawerIcon('mail-unread'),
+          drawerIcon: renderDrawerIcon('mail-unread-outline'),
           headerShown: true,
           headerTitle: 'Received Requests',
           headerStyle: styles.headerStyle,
@@ -100,7 +97,7 @@ const DrawerNavigator: React.FC = () => {
         name="Sent"
         component={SentScreen}
         options={{
-          drawerIcon: renderDrawerIcon('mail'),
+          drawerIcon: renderDrawerIcon('mail-outline'),
           headerShown: true,
           headerTitle: 'Send Requests',
           headerStyle: styles.headerStyle,
@@ -143,12 +140,11 @@ const styles = StyleSheet.create({
     padding: 15,
     margin: 10,
     borderRadius: 5,
-    backgroundColor: '#ff6347', // Change to your preferred color
+    backgroundColor: '#000', // Change to your preferred color
     alignItems: 'center',
   },
   logoutText: {
-    color: '#fff', // Text color
-    fontSize: 16,
+    color: '#f5f5f5', // Text color
   },
   headerStyle: {
     elevation: 6, // For Android shadow
