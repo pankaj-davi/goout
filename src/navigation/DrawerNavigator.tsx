@@ -60,9 +60,6 @@ const DrawerNavigator: React.FC = () => {
         drawerStyle: {
           backgroundColor: '#f5f5f5',
         },
-        drawerLabelStyle: {
-          fontSize: 18,
-        },
       }}
     >
       {/* Home Screen */}
@@ -143,12 +140,11 @@ const styles = StyleSheet.create({
     padding: 15,
     margin: 10,
     borderRadius: 5,
-    backgroundColor: '#ff6347', // Change to your preferred color
+    backgroundColor: '#000', // Change to your preferred color
     alignItems: 'center',
   },
   logoutText: {
-    color: '#fff', // Text color
-    fontSize: 16,
+    color: '#f5f5f5', // Text color
   },
   headerStyle: {
     elevation: 6, // For Android shadow

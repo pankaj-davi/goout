@@ -40,9 +40,9 @@ const styles = StyleSheet.create({
     paddingBottom: 5,
   },
   markerImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25, // Circular shape
+    width: 40,
+    height: 40,
+    borderRadius: 20, // Circular shape
     borderWidth: 2,
     borderColor: 'white',
     backgroundColor: 'black', // Fill color for the pin
