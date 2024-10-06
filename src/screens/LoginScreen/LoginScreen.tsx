@@ -21,10 +21,7 @@ const LoginScreen: React.FC = () => {
         style={styles.googleButton}
         size={GoogleSigninButton.Size.Wide}
         color={GoogleSigninButton.Color.Dark}
-        onPress={() => {
-          console.log('FFFFFFFFFFFFFFFFFFFFFFFFFFFF');
-          login();
-        }}
+        onPress={() => login()}
       />
     </View>
   );

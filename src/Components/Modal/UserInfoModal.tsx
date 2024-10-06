@@ -51,14 +51,12 @@ const UserInfoModal: React.FC<UserInfoModalProps> = ({
       if (friendDoc.exists) {
         const friendData = friendDoc.data();
         const friendDeviceToken = friendData?.deviceToken; // Assuming deviceToken is stored in the friend's data
-        console.log(friendData, '$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$');
         // Trigger notification to the friend
         if (friendDeviceToken) {
-          console.log(friendDeviceToken, 'friendDeviceToken');
           const title = `${currentUser.name} sent you a friend request!`;
           const body = `You have received a friend request from ${friendSeletedUser?.name}.`;
           await sendCustomPushNotification(
-            friendData?.deviceToken,
+            friendData.deviceToken,
             title,
             body,
             friendData.photo
@@ -66,8 +64,7 @@ const UserInfoModal: React.FC<UserInfoModalProps> = ({
         }
       }
 
-      // onClose();
-      console.log('Friend added successfully!');
+      onClose();
     } catch (error) {
       console.error('Error adding friend: ', error);
     }

@@ -48,11 +48,12 @@ const App: React.FC = () => {
     const initializeNotifications = async () => {
       await requestNotificationPermission();
       createNotificationChannel();
+
       const unsubscribeForeground = setupForegroundNotificationHandler();
-      setupBackgroundNotificationHandler();
+      setupBackgroundNotificationHandler(); // Register background handler here
 
       return () => {
-        unsubscribeForeground();
+        unsubscribeForeground(); // Unsubscribe from foreground notifications
       };
     };
 

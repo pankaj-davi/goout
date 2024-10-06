@@ -41,10 +41,6 @@ export interface IUser {
   familyName?: string | null;
   givenName?: string | null;
   deviceToken: string;
-  location: {
-    latitude: number | null;
-    longitude: number | null;
-  };
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -85,7 +81,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   });
 
   const saveUserDataToFirestore = async (userData: IUser) => {
-    console.log('User Data before saving:', userData);
     try {
       await firestore()
         .collection('users')
@@ -138,10 +133,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           displayName: user.displayName || null,
           photoURL: user.photoURL || profile.picture || null,
           deviceToken,
-          location: {
-            latitude: user.location.latitude || null,
-            longitude: user.location.longitude || null,
-          },
         };
 
         // Set user and authentication state
