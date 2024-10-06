@@ -16,6 +16,8 @@ import {
 } from '@react-native-google-signin/google-signin';
 import { FIRE_BASE_CLIENT_ID } from '@env';
 
+import messaging from '@react-native-firebase/messaging';
+
 interface GoogleUserInfo {
   idToken?: string;
   accessToken?: string;
@@ -32,19 +34,17 @@ interface AuthContextProps {
 export interface IUser {
   uid: string;
   name: string | null;
-  email: string;
   photo: string | null;
-  familyName?: string | null; // Optional
-  givenName?: string | null; // Optional
-}
-
-interface CustomUser {
-  uid: string;
   displayName: string | null;
   email: string | null;
   photoURL: string | null;
   familyName?: string | null;
   givenName?: string | null;
+  deviceToken: string;
+  location: {
+    latitude: number | null;
+    longitude: number | null;
+  };
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -59,7 +59,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   useEffect(() => {
     const checkUserStatus = async () => {
       try {
-        const userData = await AsyncStorage.getItem('user');
+        const userData = await AsyncStorage.getItem('users');
         if (userData) {
           setUser(JSON.parse(userData));
           setIsAuthenticated(true);
@@ -84,22 +84,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     webClientId: FIRE_BASE_CLIENT_ID,
   });
 
-  const saveUserDataToFirestore = async (userData: CustomUser) => {
+  const saveUserDataToFirestore = async (userData: IUser) => {
     console.log('User Data before saving:', userData);
     try {
-      const userDoc = {
-        uid: userData.uid || '',
-        name: userData.displayName || null,
-        email: userData.email || null,
-        photo: userData.photoURL || null,
-        familyName: userData.familyName || null,
-        givenName: userData.givenName || null,
-      };
-
       await firestore()
         .collection('users')
         .doc(userData.uid)
-        .set(userDoc, { merge: true });
+        .set(userData, { merge: true });
       console.log('User data saved to Firestore successfully');
     } catch (err) {
       console.error('Error saving user data to Firestore:', err);
@@ -108,7 +99,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   const saveUserDataToStorage = async (userData: IUser) => {
     try {
-      await AsyncStorage.setItem('user', JSON.stringify(userData));
+      await AsyncStorage.setItem('users', JSON.stringify(userData));
     } catch (error) {
       console.error('Error saving user data to storage:', error);
     }
@@ -134,6 +125,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       if (additionalUserInfo && additionalUserInfo.profile) {
         const { profile } = additionalUserInfo;
 
+        const deviceToken = await messaging().getToken();
+
         // Mapping to the IUser interface for easy usage later
         const userInfoToStore: IUser = {
           uid: user.uid,
@@ -141,7 +134,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           email: user.email || profile.email || '', // use the profile email as a fallback
           photo: user.photoURL || profile.picture || null, // fallback to Google profile picture
           familyName: profile.family_name || null, // optional
-          givenName: profile.given_name || null, // optional
+          givenName: profile.given_name || null,
+          displayName: user.displayName || null,
+          photoURL: user.photoURL || profile.picture || null,
+          deviceToken,
+          location: {
+            latitude: user.location.latitude || null,
+            longitude: user.location.longitude || null,
+          },
         };
 
         // Set user and authentication state
@@ -150,14 +150,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
         // Save the user data to AsyncStorage and Firestore
         await saveUserDataToStorage(userInfoToStore);
-        await saveUserDataToFirestore({
-          uid: user.uid,
-          displayName: user.displayName || profile.given_name,
-          email: user.email,
-          photoURL: user.photoURL,
-          familyName: profile.family_name,
-          givenName: profile.given_name,
-        });
+        await saveUserDataToFirestore(userInfoToStore);
       }
 
       console.log('User signed in successfully');
@@ -175,7 +168,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       await GoogleSignin.signOut();
       setIsAuthenticated(false);
       setUser(null);
-      await AsyncStorage.removeItem('user'); // Clear user data from AsyncStorage
+      await AsyncStorage.removeItem('users'); // Clear user data from AsyncStorage
     } catch (error) {
       console.error(
         'Logout Error:',

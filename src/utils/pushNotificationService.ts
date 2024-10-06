@@ -1,9 +1,8 @@
-// src/utils/pushNotificationService.ts
 import PushNotification from 'react-native-push-notification';
 import messaging from '@react-native-firebase/messaging';
 
 /**
- * Function to send a custom notification with an optional image
+ * Function to send a custom push notification using the Node.js API
  * @param deviceToken The device token of the recipient
  * @param title The title of the notification
  * @param body The body message of the notification
@@ -15,26 +14,39 @@ export const sendCustomPushNotification = async (
   body: string,
   imageUrl?: string // Optional image URL
 ) => {
-  // console.log('##############################');
   try {
-    // Send the notification using push notifications
-    PushNotification.localNotification({
-      channelId: 'your-channel-id-01', // Make sure the channel exists
-      title: title,
-      message: body,
-      playSound: true,
-      soundName: 'default',
-      largeIconUrl: imageUrl, // Add image URL here (FCM for remote image)
-      bigPictureUrl: imageUrl, // Big image (Android only)
+    // Payload for the Node.js API
+    const payload = {
+      deviceToken,
+      title,
+      body,
+      imageUrl,
+    };
+
+    // Send a POST request to the Node.js API (replace localhost with your server IP if needed)
+    const response = await fetch('http://192.168.1.3:3000/send-notification', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload), // Convert the payload to JSON
     });
 
-    console.log('Push notification with image sent successfully!');
+    // Check for errors in the response
+    if (!response.ok) {
+      const responseText = await response.text(); // Fetch error details
+      throw new Error(`Failed to send push notification: ${responseText}`);
+    }
+
+    const result = await response.json();
+    console.log('Push notification sent successfully!', result);
   } catch (error) {
     console.error('Failed to send push notification:', error);
   }
 };
 
-// Export other functions you already have, such as createNotificationChannel, setupForegroundNotificationHandler, etc.
+// Other notification handlers...
+
 export const createNotificationChannel = () => {
   PushNotification.createChannel(
     {

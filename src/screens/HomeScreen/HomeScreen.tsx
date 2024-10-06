@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Alert, Image } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
-import { useAuth } from '../../context/AuthContext';
+import { IUser, useAuth } from '../../context/AuthContext';
 import firestore from '@react-native-firebase/firestore';
 import DrawerButton from '../../Components/DrawerButton/DrawerButton';
 import UserInfoModal from '../../Components/Modal/UserInfoModal'; // Adjust the path as necessary
@@ -10,13 +10,6 @@ import UserInfoModal from '../../Components/Modal/UserInfoModal'; // Adjust the 
 interface GeoPoint {
   latitude: number;
   longitude: number;
-}
-
-interface User {
-  uid: string;
-  name: string;
-  photo: string;
-  location: GeoPoint;
 }
 
 const styles = StyleSheet.create({
@@ -69,10 +62,12 @@ const styles = StyleSheet.create({
 
 const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const { user } = useAuth();
-  const [allUsers, setAllUsers] = useState<User[]>([]);
+  const [allUsers, setAllUsers] = useState<any[]>([]);
   const [currentLocation, setCurrentLocation] = useState<GeoPoint | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [friendSeletedUser, setSeletedFriendUser] = useState<User | null>(null);
+  const [friendSeletedUser, setSeletedFriendUser] = useState<IUser | null>(
+    null
+  );
 
   // Function to update user's current location
   const updateLocation = (latitude: number, longitude: number) => {
@@ -82,7 +77,7 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   };
 
   // Function to get current position
-  const getCurrentPosition = () => {
+  const getCurrentPosition = async () => {
     Geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
@@ -103,21 +98,15 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const fetchAllUsersWithLocation = async () => {
     try {
       const usersSnapshot = await firestore()
-        .collection('userWithLocation') // Ensure this matches your Firestore collection
+        .collection('users') // Ensure this matches your Firestore collection
         .get();
-      const usersWithLocation: User[] = usersSnapshot.docs.map((doc) => {
-        const data = doc.data();
-        return {
-          uid: doc.id,
-          name: data.name,
-          photo: data.photo,
-          location: data.location,
-        };
-      });
-      console.log(usersWithLocation, '###');
+
+      // Directly passing the data as it is
+      const usersWithLocation = usersSnapshot.docs.map((doc) => doc.data());
+
       setAllUsers(usersWithLocation);
     } catch (error) {
-      console.error('Error fetching users:', error);
+      console.error('Error fetching users with location:', error);
     }
   };
 
@@ -125,15 +114,12 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const saveUserLocation = async (latitude: number, longitude: number) => {
     if (user) {
       try {
-        const userDocRef = firestore()
-          .collection('userWithLocation')
-          .doc(user.email); // Use the user email as the document ID
+        const userDocRef = firestore().collection('users').doc(user.uid); // Use the user email as the document ID
         const doc = await userDocRef.get(); // Check if document exists
-
+        console.log(doc, 'docdocdocdoc');
         if (!doc.exists) {
           await userDocRef.set({
-            name: user.name || 'Unknown User',
-            photo: user.photo || 'https://example.com/default-avatar.png',
+            ...user,
             location: {
               latitude,
               longitude,
@@ -157,7 +143,7 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
   useEffect(() => {
     getCurrentPosition(); // Get the initial position
-    fetchAllUsersWithLocation(); // Fetch users only once on mount
+    // fetchAllUsersWithLocation(); // Fetch users only once on mount
   }, []);
 
   const resetModal = () => {
@@ -184,7 +170,7 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
               <View style={styles.markerPin}>
                 <Image
                   source={{
-                    uri: user!?.photo!,
+                    uri: user!.photo!,
                   }}
                   style={styles.markerImage}
                 />
@@ -195,10 +181,10 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
         {allUsers.map((otherUser) => {
           const { location, photo, uid } = otherUser;
-          console.log(
-            otherUser,
-            'otherUserotherUserotherUserotherUserotherUser'
-          );
+          // console.log(
+          //   otherUser,
+          //   'otherUserotherUserotherUserotherUserotherUser'
+          // );
           if (location && location.latitude && location.longitude) {
             return (
               <Marker
