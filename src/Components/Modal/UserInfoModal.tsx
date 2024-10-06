@@ -9,22 +9,13 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons'; // Importing Ionicons from react-native-vector-icons
 import firestore from '@react-native-firebase/firestore';
-import notificationUtils from '../notificationUtils/notificationUtils'; // Import notification utility
+import { sendCustomPushNotification } from '../../utils/pushNotificationService'; // Import notification utility
+import { IUser } from 'src/context/AuthContext';
 
 interface UserInfoModalProps {
   visible: boolean;
-  currentUser: {
-    uid: string;
-  };
-  friendSeletedUser: {
-    uid: string;
-    name: string;
-    photo: string;
-    location: {
-      latitude: number;
-      longitude: number;
-    };
-  } | null;
+  currentUser: IUser;
+  friendSeletedUser: IUser | null;
   onClose: () => void;
   onSendRequest: () => void; // Add prop for sending request
   onMoreInfo: () => void; // Add prop for more info
@@ -60,17 +51,20 @@ const UserInfoModal: React.FC<UserInfoModalProps> = ({
       if (friendDoc.exists) {
         const friendData = friendDoc.data();
         const friendDeviceToken = friendData?.deviceToken; // Assuming deviceToken is stored in the friend's data
-
         // Trigger notification to the friend
         if (friendDeviceToken) {
-          const title = `${currentUser.uid} sent you a friend request!`;
+          const title = `${currentUser.name} sent you a friend request!`;
           const body = `You have received a friend request from ${friendSeletedUser?.name}.`;
-          await notificationUtils.showNotification(title, body);
+          await sendCustomPushNotification(
+            friendData.deviceToken,
+            title,
+            body,
+            friendData.photo
+          );
         }
       }
 
       onClose();
-      console.log('Friend added successfully!');
     } catch (error) {
       console.error('Error adding friend: ', error);
     }

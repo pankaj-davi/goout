@@ -6,12 +6,12 @@ import LoginScreen from './src/screens/LoginScreen/LoginScreen';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ActivityIndicator, View, StyleSheet } from 'react-native';
 import DrawerNavigator from './src/navigation/DrawerNavigator';
-import { requestNotificationPermission } from './src/utils/notificationPermissions'; // New import
+import { requestNotificationPermission } from './src/utils/notificationPermissions';
 import {
   createNotificationChannel,
   setupForegroundNotificationHandler,
   setupBackgroundNotificationHandler,
-} from './src/utils/pushNotificationService'; // New import
+} from './src/utils/pushNotificationService';
 
 const Stack = createNativeStackNavigator();
 
@@ -46,14 +46,14 @@ const MainApp: React.FC = () => {
 const App: React.FC = () => {
   useEffect(() => {
     const initializeNotifications = async () => {
-      await requestNotificationPermission(); // Request permission
-      createNotificationChannel(); // Create notification channel
-      const unsubscribeForeground = setupForegroundNotificationHandler(); // Handle foreground messages
-      setupBackgroundNotificationHandler(); // Handle background messages
+      await requestNotificationPermission();
+      createNotificationChannel();
 
-      // Cleanup on unmount
+      const unsubscribeForeground = setupForegroundNotificationHandler();
+      setupBackgroundNotificationHandler(); // Register background handler here
+
       return () => {
-        unsubscribeForeground();
+        unsubscribeForeground(); // Unsubscribe from foreground notifications
       };
     };
 

@@ -2,21 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Alert, Image } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
-import { useAuth } from '../../context/AuthContext';
+import { IUser, useAuth } from '../../context/AuthContext';
 import firestore from '@react-native-firebase/firestore';
-import DrawerButton from '../../Components/DrawerButton/DrawerButton';
 import UserInfoModal from '../../Components/Modal/UserInfoModal'; // Adjust the path as necessary
+import DrawerButton from '../../Components/DrawerButton/DrawerButton';
 
 interface GeoPoint {
   latitude: number;
   longitude: number;
-}
-
-interface User {
-  uid: string;
-  name: string;
-  photo: string;
-  location: GeoPoint;
 }
 
 const styles = StyleSheet.create({
@@ -42,15 +35,14 @@ const styles = StyleSheet.create({
   markerImage: {
     width: 40,
     height: 40,
-    borderRadius: 20, // Circular shape
+    borderRadius: 20,
     borderWidth: 2,
     borderColor: 'white',
-    backgroundColor: 'black', // Fill color for the pin
+    backgroundColor: 'black',
     position: 'relative',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    // Add shadow for a 3D effect (optional)
     shadowColor: 'rgba(0, 0, 0, 0.3)',
     shadowOffset: {
       width: 0,
@@ -60,23 +52,29 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
   },
   currentUserMarker: {
-    borderColor: 'blue', // Color for the current user's marker
+    borderColor: 'blue',
   },
   otherUserMarker: {
-    borderColor: 'green', // Color for other users' markers
+    borderColor: 'green',
   },
 });
 
 const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const { user } = useAuth();
-  const [allUsers, setAllUsers] = useState<User[]>([]);
+  const [allUsers, setAllUsers] = useState<any[]>([]);
   const [currentLocation, setCurrentLocation] = useState<GeoPoint | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [friendSeletedUser, setSeletedFriendUser] = useState<User | null>(null);
+  const [selectedFriendUser, setSelectedFriendUser] = useState<IUser | null>(
+    null
+  );
+
+  useEffect(() => {
+    fetchAllUsersWithLocation(); // Fetch users on mount
+    getCurrentPosition(); // Get the initial position
+  }, []);
 
   // Function to update user's current location
   const updateLocation = (latitude: number, longitude: number) => {
-    console.log({ latitude, longitude });
     setCurrentLocation({ latitude, longitude });
     saveUserLocation(latitude, longitude);
   };
@@ -102,22 +100,12 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   // Function to fetch all users with location
   const fetchAllUsersWithLocation = async () => {
     try {
-      const usersSnapshot = await firestore()
-        .collection('userWithLocation') // Ensure this matches your Firestore collection
-        .get();
-      const usersWithLocation: User[] = usersSnapshot.docs.map((doc) => {
-        const data = doc.data();
-        return {
-          uid: doc.id,
-          name: data.name,
-          photo: data.photo,
-          location: data.location,
-        };
-      });
-      console.log(usersWithLocation, '###');
+      const usersSnapshot = await firestore().collection('users').get();
+
+      const usersWithLocation = usersSnapshot.docs.map((doc) => doc.data());
       setAllUsers(usersWithLocation);
     } catch (error) {
-      console.error('Error fetching users:', error);
+      console.error('Error fetching users with location:', error);
     }
   };
 
@@ -125,27 +113,17 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const saveUserLocation = async (latitude: number, longitude: number) => {
     if (user) {
       try {
-        const userDocRef = firestore()
-          .collection('userWithLocation')
-          .doc(user.email); // Use the user email as the document ID
-        const doc = await userDocRef.get(); // Check if document exists
-
+        const userDocRef = firestore().collection('users').doc(user.uid);
+        const doc = await userDocRef.get();
         if (!doc.exists) {
           await userDocRef.set({
-            name: user.name || 'Unknown User',
-            photo: user.photo || 'https://example.com/default-avatar.png',
-            location: {
-              latitude,
-              longitude,
-            },
+            ...user,
+            location: { latitude, longitude },
           });
           console.log('User details saved successfully', user);
         } else {
           await userDocRef.update({
-            location: {
-              latitude,
-              longitude,
-            },
+            location: { latitude, longitude },
           });
           console.log('User location updated successfully');
         }
@@ -155,19 +133,14 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     }
   };
 
-  useEffect(() => {
-    getCurrentPosition(); // Get the initial position
-    fetchAllUsersWithLocation(); // Fetch users only once on mount
-  }, []);
-
   const resetModal = () => {
     setModalVisible(false);
-    setSeletedFriendUser(null);
+    setSelectedFriendUser(null);
   };
 
   return (
     <View style={styles.container}>
-      <DrawerButton navigation={navigation} userPhoto={user!.photo!} />
+      <DrawerButton navigation={navigation} userPhoto={user.photo || ''} />
       <MapView
         provider={PROVIDER_GOOGLE}
         style={styles.map}
@@ -183,9 +156,7 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             <View style={[styles.markerContainer, styles.currentUserMarker]}>
               <View style={styles.markerPin}>
                 <Image
-                  source={{
-                    uri: user!?.photo!,
-                  }}
+                  source={{ uri: user!.photo! }}
                   style={styles.markerImage}
                 />
               </View>
@@ -195,10 +166,6 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
         {allUsers.map((otherUser) => {
           const { location, photo, uid } = otherUser;
-          console.log(
-            otherUser,
-            'otherUserotherUserotherUserotherUserotherUser'
-          );
           if (location && location.latitude && location.longitude) {
             return (
               <Marker
@@ -208,18 +175,13 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                   longitude: location.longitude,
                 }}
                 onPress={() => {
-                  setSeletedFriendUser(otherUser);
+                  setSelectedFriendUser(otherUser);
                   setModalVisible(true);
                 }}
               >
                 <View style={[styles.markerContainer, styles.otherUserMarker]}>
                   <View style={styles.markerPin}>
-                    <Image
-                      source={{
-                        uri: photo,
-                      }}
-                      style={styles.markerImage}
-                    />
+                    <Image source={{ uri: photo }} style={styles.markerImage} />
                   </View>
                 </View>
               </Marker>
@@ -233,7 +195,7 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       <UserInfoModal
         visible={modalVisible}
         currentUser={user}
-        friendSeletedUser={friendSeletedUser}
+        friendSeletedUser={selectedFriendUser}
         onClose={resetModal}
         onSendRequest={() => console.log('Send request pressed')}
         onMoreInfo={() => console.log('More info pressed')}
@@ -241,7 +203,6 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     </View>
   );
 };
-
 // Function to calculate the distance between two geographic points
 // const calculateDistance = (
 //   point1: GeoPoint | null,
@@ -270,5 +231,4 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
 //   return R * c; // Distance in meters
 // };
-
 export default HomeScreen;
