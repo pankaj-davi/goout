@@ -45,7 +45,6 @@ const UserInfoModal: React.FC<UserInfoModalProps> = ({
           friendId: friendId,
           addedAt: firestore.FieldValue.serverTimestamp(), // Optional: Track when the friend was added
         });
-
       // Retrieve the friend's device token
       const friendDoc = await friendRef.get();
       if (friendDoc.exists) {
@@ -59,7 +58,7 @@ const UserInfoModal: React.FC<UserInfoModalProps> = ({
             friendData.deviceToken,
             title,
             body,
-            friendData.photo
+            currentUser.photo || ''
           );
         }
       }

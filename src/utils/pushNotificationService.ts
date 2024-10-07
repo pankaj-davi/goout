@@ -39,7 +39,7 @@ export const setupForegroundNotificationHandler = () => {
       message: message, // Ensure message is a string
       playSound: true,
       soundName: 'gooutsound',
-      bigPictureUrl: imageUrl, // Include the image URL if available
+      largeIconUrl: imageUrl, // Include the image URL if available
     });
   });
 };
@@ -65,7 +65,7 @@ export const setupBackgroundNotificationHandler = () => {
       message: message, // Ensure message is a string
       playSound: true,
       soundName: 'gooutsound',
-      bigPictureUrl: imageUrl, // Include the image URL if available
+      largeIconUrl: imageUrl, // Include the image URL if available
     });
   });
 };
