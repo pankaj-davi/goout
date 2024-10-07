@@ -93,7 +93,9 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           'Unable to get current location. Please try again later.'
         );
       },
-      { enableHighAccuracy: true }
+      {
+        enableHighAccuracy: false,
+      }
     );
   };
 

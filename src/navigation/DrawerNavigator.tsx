@@ -9,8 +9,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import HomeScreen from '../screens/HomeScreen/HomeScreen';
 import FriendsScreen from '../screens/FriendsScreen/FriendsScreen';
-import ReceivedScreen from '../screens/ReceivedScreen/ReceivedScreen'; // Import your Received Screen
-import SentScreen from '../screens/SentScreen/SentScreen'; // Import your Sent Screen
+import RequestScreen from '../screens/RequestScreen/RequestScreen'; // Import your new Request Screen
 import { useAuth } from '../context/AuthContext';
 
 const Drawer = createDrawerNavigator();
@@ -79,27 +78,17 @@ const DrawerNavigator: React.FC = () => {
           drawerIcon: renderDrawerIcon('people-outline'),
           headerShown: true,
           headerTitle: 'Friends',
-          headerStyle: styles.headerStyle, // Use defined styles
-        }}
-      />
-      {/* New Screens for Received and Sent Requests with similar styling */}
-      <Drawer.Screen
-        name="Received"
-        component={ReceivedScreen}
-        options={{
-          drawerIcon: renderDrawerIcon('mail-unread-outline'),
-          headerShown: true,
-          headerTitle: 'Received Requests',
           headerStyle: styles.headerStyle,
         }}
       />
+      {/* New Request Screen with Tabs */}
       <Drawer.Screen
-        name="Sent"
-        component={SentScreen}
+        name="Requests"
+        component={RequestScreen} // Updated to use the new Request screen
         options={{
           drawerIcon: renderDrawerIcon('mail-outline'),
           headerShown: true,
-          headerTitle: 'Send Requests',
+          headerTitle: 'Requests',
           headerStyle: styles.headerStyle,
         }}
       />
@@ -114,16 +103,16 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   profileImage: {
-    width: 70, // Size of the profile image
+    width: 70,
     height: 70,
-    borderRadius: 35, // Circular image
+    borderRadius: 35,
     marginBottom: 10,
   },
   profileImagePlaceholder: {
     width: 70,
     height: 70,
     borderRadius: 35,
-    backgroundColor: '#ccc', // Placeholder background color
+    backgroundColor: '#ccc',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 10,
@@ -140,21 +129,21 @@ const styles = StyleSheet.create({
     padding: 15,
     margin: 10,
     borderRadius: 5,
-    backgroundColor: '#000', // Change to your preferred color
+    backgroundColor: '#000',
     alignItems: 'center',
   },
   logoutText: {
-    color: '#f5f5f5', // Text color
+    color: '#f5f5f5',
   },
   headerStyle: {
-    elevation: 6, // For Android shadow
-    shadowColor: '#000', // Shadow color for iOS
+    elevation: 6,
+    shadowColor: '#000',
     shadowOffset: {
-      width: 0, // Horizontal offset
-      height: 2, // Vertical offset
+      width: 0,
+      height: 2,
     },
-    shadowOpacity: 0.9, // Shadow opacity
-    shadowRadius: 4, // Shadow blur radius
+    shadowOpacity: 0.9,
+    shadowRadius: 4,
   },
 });
 
