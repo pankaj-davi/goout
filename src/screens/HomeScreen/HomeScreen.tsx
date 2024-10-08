@@ -6,6 +6,7 @@ import { IUser, useAuth } from '../../context/AuthContext';
 import firestore from '@react-native-firebase/firestore';
 import UserInfoModal from '../../Components/Modal/UserInfoModal'; // Adjust the path as necessary
 import DrawerButton from '../../Components/DrawerButton/DrawerButton';
+import { useFriendsList } from '../../hooks/useFriendsList';
 
 interface GeoPoint {
   latitude: number;
@@ -61,6 +62,7 @@ const styles = StyleSheet.create({
 
 const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const { user } = useAuth();
+  const { friends } = useFriendsList();
   const [allUsers, setAllUsers] = useState<any[]>([]);
   const [currentLocation, setCurrentLocation] = useState<GeoPoint | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -71,6 +73,7 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   useEffect(() => {
     fetchAllUsersWithLocation(); // Fetch users on mount
     getCurrentPosition(); // Get the initial position
+    console.log('check pankaj', friends);
   }, []);
 
   // Function to update user's current location
@@ -199,8 +202,6 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         currentUser={user}
         friendSeletedUser={selectedFriendUser}
         onClose={resetModal}
-        onSendRequest={() => console.log('Send request pressed')}
-        onMoreInfo={() => console.log('More info pressed')}
       />
     </View>
   );

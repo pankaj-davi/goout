@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Modal,
   Text,
@@ -10,15 +10,14 @@ import {
 import Icon from 'react-native-vector-icons/Ionicons'; // Importing Ionicons from react-native-vector-icons
 import firestore from '@react-native-firebase/firestore';
 import { sendCustomPushNotification } from '../../utils/pushNotificationService'; // Import notification utility
-import { IUser } from 'src/context/AuthContext';
+import { IUser } from '../../../src/context/AuthContext';
+import { useFriendsListContext } from '../../../src/context/FriendsListContext';
 
 interface UserInfoModalProps {
   visible: boolean;
   currentUser: IUser;
   friendSeletedUser: IUser | null;
   onClose: () => void;
-  onSendRequest: () => void; // Add prop for sending request
-  onMoreInfo: () => void; // Add prop for more info
 }
 
 const UserInfoModal: React.FC<UserInfoModalProps> = ({
@@ -26,15 +25,20 @@ const UserInfoModal: React.FC<UserInfoModalProps> = ({
   currentUser,
   friendSeletedUser,
   onClose,
-  onSendRequest,
-  onMoreInfo,
 }) => {
+  const { friends } = useFriendsListContext();
+  const [loading, setLoading] = useState(false);
+
+  // Check if the selected user is already a friend
+  const isFriendRequestState = friends
+    .map(({ uid }) => uid)
+    .includes(friendSeletedUser?.uid);
+
   // Add a friend to the current user’s friends list
   const addFriend = async (currentUserId: string, friendId: string) => {
     try {
-      // Reference to the current user's document
       const userRef = firestore().collection('users').doc(currentUserId);
-      const friendRef = firestore().collection('users').doc(friendId); // Reference to the friend's document
+      const friendRef = firestore().collection('users').doc(friendId);
 
       // Add friend's ID to the friends subcollection
       await userRef
@@ -42,40 +46,54 @@ const UserInfoModal: React.FC<UserInfoModalProps> = ({
         .doc(friendId)
         .set({
           ...friendSeletedUser,
-          friendId: friendId,
-          addedAt: firestore.FieldValue.serverTimestamp(), // Optional: Track when the friend was added
+          requestState: 'Pending',
+          addedAt: firestore.FieldValue.serverTimestamp(),
         });
+
       // Retrieve the friend's device token
       const friendDoc = await friendRef.get();
       if (friendDoc.exists) {
         const friendData = friendDoc.data();
-        const friendDeviceToken = friendData?.deviceToken; // Assuming deviceToken is stored in the friend's data
+        const friendDeviceToken = friendData?.deviceToken;
+
         // Trigger notification to the friend
         if (friendDeviceToken) {
           const title = `${currentUser.name} sent you a friend request!`;
           const body = `You have received a friend request from ${friendSeletedUser?.name}.`;
-          await sendCustomPushNotification(
-            friendData.deviceToken,
-            title,
-            body,
-            currentUser.photo || ''
-          );
+          try {
+            await sendCustomPushNotification(
+              friendDeviceToken,
+              title,
+              body,
+              currentUser.photo || ''
+            );
+          } catch (notificationError) {
+            console.error(
+              'Failed to send push notification: ',
+              notificationError
+            );
+          }
         }
       }
-
       onClose();
     } catch (error) {
       console.error('Error adding friend: ', error);
     }
   };
 
+  const handleAddFriend = async () => {
+    setLoading(true);
+    await addFriend(currentUser.uid, friendSeletedUser.uid);
+    setLoading(false);
+  };
+
   return (
     <Modal
       transparent={true}
       visible={visible}
-      animationType="fade" // Change to 'fade' for smoother transitions
+      animationType="fade"
       onRequestClose={onClose}
-      supportedOrientations={['portrait', 'landscape']} // Handle orientation changes if needed
+      supportedOrientations={['portrait', 'landscape']}
     >
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
@@ -94,21 +112,28 @@ const UserInfoModal: React.FC<UserInfoModalProps> = ({
               </Text>
               <View style={styles.buttonContainer}>
                 <TouchableOpacity
-                  onPress={onSendRequest}
-                  style={styles.primaryButton}
+                  onPress={handleAddFriend}
+                  disabled={isFriendRequestState || loading}
+                  style={[
+                    styles.primaryButton,
+                    (isFriendRequestState || loading) && styles.disabledButton,
+                  ]}
+                  accessible={true}
+                  accessibilityLabel="Send friend request"
                 >
-                  <Text
-                    style={styles.buttonText}
-                    onPress={() =>
-                      addFriend(currentUser.uid, friendSeletedUser.uid)
-                    }
-                  >
-                    Send Request
+                  <Text style={styles.buttonText}>
+                    {loading
+                      ? 'Sending...'
+                      : isFriendRequestState
+                        ? 'Pending'
+                        : 'Send Request'}
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  onPress={onMoreInfo}
+                  // onPress={onMoreInfo} // Uncomment when implementing More Info functionality
                   style={styles.secondaryButton}
+                  accessible={true}
+                  accessibilityLabel="More information about the user"
                 >
                   <Text style={styles.buttonText}>More Info</Text>
                 </TouchableOpacity>
@@ -126,7 +151,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Ensure a smooth background
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
     width: 300,
@@ -159,16 +184,19 @@ const styles = StyleSheet.create({
   primaryButton: {
     flex: 1,
     padding: 10,
-    backgroundColor: '#007BFF', // Primary button color
+    backgroundColor: '#007BFF',
     borderRadius: 5,
-    marginRight: 5, // Add margin between buttons
+    marginRight: 5,
   },
   secondaryButton: {
     flex: 1,
     padding: 10,
-    backgroundColor: '#6c757d', // Secondary button color
+    backgroundColor: '#6c757d',
     borderRadius: 5,
-    marginLeft: 5, // Add margin between buttons
+    marginLeft: 5,
+  },
+  disabledButton: {
+    backgroundColor: '#A0A0A0', // Light grey for disabled state
   },
   buttonText: {
     color: 'white',

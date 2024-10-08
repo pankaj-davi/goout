@@ -12,14 +12,18 @@ const RequestScreen: React.FC = () => {
       screenOptions={{
         tabBarActiveTintColor: '#000', // Minimalist active tab color
         tabBarInactiveTintColor: '#888', // Color for inactive tabs
-        tabBarStyle: { backgroundColor: '#f0f0f0' }, // Light background for the tab bar
-        tabBarLabelStyle: { fontSize: 16 }, // Slightly larger and bolder font
-        tabBarIndicatorStyle: { backgroundColor: '#6200ea', height: 3 }, // Minimalist indicator style
-        tabBarPressColor: 'rgba(98, 0, 234, 0.2)', // Soft press color
+        tabBarStyle: { backgroundColor: '#f0f0f0' },
+        tabBarLabelStyle: { fontSize: 16 },
+        tabBarIndicatorStyle: { backgroundColor: '#6200ea', height: 3 },
+        tabBarPressColor: 'rgba(98, 0, 234, 0.2)',
       }}
     >
-      <Tab.Screen name="Sent" component={SentScreen} />
-      <Tab.Screen name="Received" component={ReceivedScreen} />
+      <Tab.Screen name="Sent" component={SentScreen} key="sent-tab" />
+      <Tab.Screen
+        name="Received"
+        component={ReceivedScreen}
+        key="received-tab"
+      />
     </Tab.Navigator>
   );
 };
