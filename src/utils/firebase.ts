@@ -79,7 +79,7 @@ export const fetchUserSubCollection = (
   subcollection: 'connections' | 'friends'
 ) => {
   const { user } = useAuth(); // Get user from context
-  const [data, setData] = useState<IUserSubCollection[]>([]);
+  const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -96,12 +96,10 @@ export const fetchUserSubCollection = (
       .collection(subcollection) // Use dynamic subcollection here
       .onSnapshot(
         (snapshot) => {
-          const subCollectionList: IUserSubCollection[] = snapshot.docs.map(
-            (doc) => ({
-              id: doc.id,
-              ...(doc.data() as Omit<IUserSubCollection, 'id'>), // Exclude id from doc.data() type assertion
-            })
-          );
+          const subCollectionList: any[] = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...(doc.data() as Omit<any, 'id'>), // Exclude id from doc.data() type assertion
+          }));
           setData(subCollectionList);
           setLoading(false); // Set loading to false after fetching
         },
