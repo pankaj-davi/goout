@@ -6,8 +6,8 @@ import { IUser, useAuth } from '../../context/AuthContext';
 import firestore from '@react-native-firebase/firestore';
 import UserInfoModal from '../../Components/Modal/UserInfoModal'; // Adjust the path as necessary
 import DrawerButton from '../../Components/DrawerButton/DrawerButton';
-import { useFriendsList } from '../../hooks/useFriendsList';
 
+// Define GeoPoint interface
 interface GeoPoint {
   latitude: number;
   longitude: number;
@@ -60,9 +60,9 @@ const styles = StyleSheet.create({
   },
 });
 
+// Main component
 const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const { user } = useAuth();
-  const { friends } = useFriendsList();
   const [allUsers, setAllUsers] = useState<any[]>([]);
   const [currentLocation, setCurrentLocation] = useState<GeoPoint | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -73,7 +73,6 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   useEffect(() => {
     fetchAllUsersWithLocation(); // Fetch users on mount
     getCurrentPosition(); // Get the initial position
-    console.log('check pankaj', friends);
   }, []);
 
   // Function to update user's current location
@@ -97,7 +96,7 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         );
       },
       {
-        enableHighAccuracy: false,
+        enableHighAccuracy: true, // Ensure high accuracy for better location
       }
     );
   };
@@ -106,7 +105,6 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const fetchAllUsersWithLocation = async () => {
     try {
       const usersSnapshot = await firestore().collection('users').get();
-
       const usersWithLocation = usersSnapshot.docs.map((doc) => doc.data());
       setAllUsers(usersWithLocation);
     } catch (error) {
@@ -149,11 +147,17 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       <MapView
         provider={PROVIDER_GOOGLE}
         style={styles.map}
+        // liteMode={true}
         region={{
           latitude: currentLocation?.latitude || 37.78825,
           longitude: currentLocation?.longitude || -122.4324,
           latitudeDelta: 0.015,
           longitudeDelta: 0.0121,
+        }}
+        showsUserLocation={false} // Control visibility of user location button
+        showsMyLocationButton={false}
+        onPress={() => {
+          if (modalVisible) resetModal(); // Close modal if the map is pressed
         }}
       >
         {currentLocation && (
@@ -179,7 +183,8 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                   latitude: location.latitude,
                   longitude: location.longitude,
                 }}
-                onPress={() => {
+                onPress={(e) => {
+                  e.stopPropagation(); // Prevents the map from reacting
                   setSelectedFriendUser(otherUser);
                   setModalVisible(true);
                 }}
@@ -197,15 +202,19 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       </MapView>
 
       {/* User Info Modal */}
-      <UserInfoModal
-        visible={modalVisible}
-        currentUser={user}
-        friendSeletedUser={selectedFriendUser}
-        onClose={resetModal}
-      />
+      {selectedFriendUser && (
+        <UserInfoModal
+          visible={modalVisible}
+          currentUser={user}
+          friendSeletedUser={selectedFriendUser}
+          onClose={resetModal}
+        />
+      )}
     </View>
   );
 };
+
+export default HomeScreen;
 // Function to calculate the distance between two geographic points
 // const calculateDistance = (
 //   point1: GeoPoint | null,
@@ -234,4 +243,3 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
 //   return R * c; // Distance in meters
 // };
-export default HomeScreen;

@@ -18,12 +18,8 @@ const RequestScreen: React.FC = () => {
         tabBarPressColor: 'rgba(98, 0, 234, 0.2)',
       }}
     >
-      <Tab.Screen name="Sent" component={SentScreen} key="sent-tab" />
-      <Tab.Screen
-        name="Received"
-        component={ReceivedScreen}
-        key="received-tab"
-      />
+      <Tab.Screen name="Sent" component={SentScreen} />
+      <Tab.Screen name="Received" component={ReceivedScreen} />
     </Tab.Navigator>
   );
 };

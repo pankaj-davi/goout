@@ -9,9 +9,8 @@ import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import HomeScreen from '../screens/HomeScreen/HomeScreen';
 import FriendsScreen from '../screens/FriendsScreen/FriendsScreen';
-import RequestScreen from '../screens/RequestScreen/RequestScreen'; // Import your new Request Screen
+import RequestScreen from '../screens/RequestScreen/RequestScreen';
 import { useAuth } from '../context/AuthContext';
-import { FriendsListProvider } from '../context/FriendsListContext'; // Import the FriendsListProvider
 
 const Drawer = createDrawerNavigator();
 
@@ -56,49 +55,47 @@ const DrawerNavigator: React.FC = () => {
 
   return (
     <>
-      <FriendsListProvider currentUserUid={user.uid}>
-        <Drawer.Navigator
-          initialRouteName="Home"
-          drawerContent={(props) => <CustomDrawerContent {...props} />}
-          screenOptions={{
-            drawerStyle: {
-              backgroundColor: '#f5f5f5',
-            },
+      <Drawer.Navigator
+        initialRouteName="Home"
+        drawerContent={(props) => <CustomDrawerContent {...props} />}
+        screenOptions={{
+          drawerStyle: {
+            backgroundColor: '#f5f5f5',
+          },
+        }}
+      >
+        {/* Home Screen */}
+        <Drawer.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{
+            drawerIcon: renderDrawerIcon('home-outline'),
+            headerShown: false,
           }}
-        >
-          {/* Home Screen */}
-          <Drawer.Screen
-            name="Home"
-            component={HomeScreen}
-            options={{
-              drawerIcon: renderDrawerIcon('home-outline'),
-              headerShown: false,
-            }}
-          />
-          {/* My Friends Screen */}
-          <Drawer.Screen
-            name="My Friends"
-            component={FriendsScreen}
-            options={{
-              drawerIcon: renderDrawerIcon('people-outline'),
-              headerShown: true,
-              headerTitle: 'Friends',
-              headerStyle: styles.headerStyle,
-            }}
-          />
-          {/* New Request Screen with Tabs */}
-          <Drawer.Screen
-            name="Requests"
-            component={RequestScreen} // Updated to use the new Request screen
-            options={{
-              drawerIcon: renderDrawerIcon('mail-outline'),
-              headerShown: true,
-              headerTitle: 'Requests',
-              headerStyle: styles.headerStyle,
-            }}
-          />
-        </Drawer.Navigator>
-      </FriendsListProvider>
+        />
+        {/* My Friends Screen */}
+        <Drawer.Screen
+          name="My Friends"
+          component={FriendsScreen}
+          options={{
+            drawerIcon: renderDrawerIcon('people-outline'),
+            headerShown: true,
+            headerTitle: 'Friends',
+            headerStyle: styles.headerStyle,
+          }}
+        />
+        {/* New Request Screen with Tabs */}
+        <Drawer.Screen
+          name="Requests"
+          component={RequestScreen} // Updated to use the new Request screen
+          options={{
+            drawerIcon: renderDrawerIcon('mail-outline'),
+            headerShown: true,
+            headerTitle: 'Requests',
+            headerStyle: styles.headerStyle,
+          }}
+        />
+      </Drawer.Navigator>
     </>
   );
 };

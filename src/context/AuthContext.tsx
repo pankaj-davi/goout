@@ -33,8 +33,8 @@ interface AuthContextProps {
 
 export interface IUser {
   uid: string;
-  name: string | null;
-  photo: string | null;
+  name: string | '';
+  photo: string | '';
   displayName: string | null;
   email: string | null;
   photoURL: string | null;
