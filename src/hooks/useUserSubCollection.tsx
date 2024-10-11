@@ -3,7 +3,7 @@ import firestore from '@react-native-firebase/firestore';
 import { IUser, useAuth } from '../context/AuthContext';
 
 export interface UseUserSubCollectionResult {
-  data: IUser[];
+  data: any[];
   loading: boolean;
   error: Error | null;
 }

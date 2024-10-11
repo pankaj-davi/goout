@@ -1,20 +1,23 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { useUserSubCollection } from '../../hooks/useUserSubCollection';
+import ListWrapper from '../../Components/ListWrapper';
+import FriendItem from '../../Components/FriendItem';
+import { IUser } from '../../../src/context/AuthContext';
 
 const FriendsScreen: React.FC = () => {
+  const { error, data: friends, loading } = useUserSubCollection('friends');
+
   return (
-    <View style={styles.container}>
-      <Text>Friends Screen</Text>
-    </View>
+    <ListWrapper
+      loading={loading}
+      error={error}
+      data={friends}
+      renderItem={({ item }: { item: IUser }) => (
+        <FriendItem photo={item.photo} name={item.name} />
+      )}
+      keyExtractor={(item) => item.uid}
+    />
   );
 };
 
 export default FriendsScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});

@@ -1,20 +1,38 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { useUserSubCollection } from '../../hooks/useUserSubCollection';
+import { useAuth } from '../../context/AuthContext';
+import ListWrapper from '../../Components/ListWrapper';
+import FriendItem from '../../Components/FriendItem';
+import { AcceptFriendRequest, RejectFriendRequest } from '../../utils/firebase';
 
 const ReceivedScreen: React.FC = () => {
+  const { user } = useAuth();
+  const {
+    error,
+    data: connections,
+    loading,
+  } = useUserSubCollection('connections');
+
+  const friendRequestStatus = connections.filter(
+    ({ requestState }) => requestState === 'ReceivedRequest'
+  );
+
   return (
-    <View style={styles.container}>
-      <Text>ReceivedScreen </Text>
-    </View>
+    <ListWrapper
+      loading={loading}
+      error={error}
+      data={friendRequestStatus}
+      renderItem={({ item }) => (
+        <FriendItem
+          photo={item.photo}
+          name={item.name}
+          onAccept={() => AcceptFriendRequest(user, item)}
+          onReject={() => RejectFriendRequest(user, item)}
+        />
+      )}
+      keyExtractor={(item) => item.uid}
+    />
   );
 };
 
 export default ReceivedScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});
