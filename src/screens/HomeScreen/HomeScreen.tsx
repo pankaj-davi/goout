@@ -4,8 +4,8 @@ import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
 import { IUser, useAuth } from '../../context/AuthContext';
 import firestore from '@react-native-firebase/firestore';
-import UserInfoModal from '../../Components/Modal/UserInfoModal'; // Adjust the path as necessary
-import DrawerButton from '../../Components/DrawerButton/DrawerButton';
+import UserInfoModal from '../../components/Modal/UserInfoModal'; // Adjust the path as necessary
+import DrawerButton from '../../components/DrawerButton/DrawerButton';
 
 // Define GeoPoint interface
 interface GeoPoint {

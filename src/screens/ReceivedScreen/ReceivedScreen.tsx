@@ -1,8 +1,8 @@
 import React from 'react';
 import { useUserSubCollection } from '../../hooks/useUserSubCollection';
 import { useAuth } from '../../context/AuthContext';
-import ListWrapper from '../../Components/ListWrapper';
-import FriendItem from '../../Components/FriendItem';
+import ListWrapper from '../../components/ListWrapper';
+import FriendItem from '../../components/FriendItem';
 import { AcceptFriendRequest, RejectFriendRequest } from '../../utils/firebase';
 
 const ReceivedScreen: React.FC = () => {

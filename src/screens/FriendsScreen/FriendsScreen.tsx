@@ -1,7 +1,7 @@
 import React from 'react';
 import { useUserSubCollection } from '../../hooks/useUserSubCollection';
-import ListWrapper from '../../Components/ListWrapper';
-import FriendItem from '../../Components/FriendItem';
+import ListWrapper from '../../components/ListWrapper';
+import FriendItem from '../../components/FriendItem';
 import { IUser } from '../../../src/context/AuthContext';
 
 const FriendsScreen: React.FC = () => {
