@@ -10,6 +10,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import HomeScreen from '../screens/HomeScreen/HomeScreen';
 import FriendsScreen from '../screens/FriendsScreen/FriendsScreen';
 import RequestScreen from '../screens/RequestScreen/RequestScreen';
+import ChatScreen from '../screens/ChatScreen/ChatScreen';
 import { useAuth } from '../context/AuthContext';
 
 const Drawer = createDrawerNavigator();
@@ -87,11 +88,21 @@ const DrawerNavigator: React.FC = () => {
         {/* New Request Screen with Tabs */}
         <Drawer.Screen
           name="Requests"
-          component={RequestScreen} // Updated to use the new Request screen
+          component={RequestScreen}
           options={{
             drawerIcon: renderDrawerIcon('mail-outline'),
             headerShown: true,
             headerTitle: 'Requests',
+            headerStyle: styles.headerStyle,
+          }}
+        />
+        <Drawer.Screen
+          name="ChatScreen"
+          component={ChatScreen}
+          options={{
+            drawerIcon: renderDrawerIcon('mail-outline'),
+            headerShown: true,
+            headerTitle: 'ChatScreen',
             headerStyle: styles.headerStyle,
           }}
         />

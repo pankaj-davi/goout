@@ -4,20 +4,27 @@ import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 interface FriendItemProps {
   photo: string;
   name: string;
+  uid: string;
   onAccept?: () => void;
   onReject?: () => void;
   onWithdraw?: () => void;
+  onPress: (uid: string, name: string) => void;
 }
 
 const FriendItem: React.FC<FriendItemProps> = ({
   photo,
   name,
+  uid,
   onAccept,
   onReject,
   onWithdraw,
+  onPress,
 }) => {
   return (
-    <View style={styles.friendItem}>
+    <TouchableOpacity
+      onPress={() => onPress(uid, name)}
+      style={styles.friendItem}
+    >
       <Image source={{ uri: photo }} style={styles.icon} />
       <View style={styles.friendDetails}>
         <Text style={styles.name}>{name}</Text>
@@ -42,7 +49,7 @@ const FriendItem: React.FC<FriendItemProps> = ({
           )}
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 

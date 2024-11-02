@@ -121,7 +121,7 @@ android {
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
-    implementation platform('com.google.firebase:firebase-bom') // Use the latest BOM version
+    implementation platform('com.google.firebase:firebase-bom:33.3.0') // Use the latest BOM version
     implementation 'com.google.firebase:firebase-firestore' // Firestore SDK
     implementation project(':react-native-maps')
     implementation 'com.google.android.gms:play-services-maps:17.0.0'
