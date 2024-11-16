@@ -86,13 +86,16 @@ export const sendCustomPushNotification = async (
     };
 
     // Send a POST request to your Node.js API
-    const response = await fetch('http://192.168.1.7:3000/send-notification', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    });
+    const response = await fetch(
+      'https://1yes86vi9g.execute-api.us-east-1.amazonaws.com/dev/send-notification',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      }
+    );
 
     if (!response.ok) {
       const responseText = await response.text(); // Fetch error details
