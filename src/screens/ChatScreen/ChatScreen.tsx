@@ -27,7 +27,8 @@ const ChatScreen: React.FC = ({ navigation, route }: any) => {
     return () => unsubscribe();
   }, [chatId]);
 
-  const sendMessage = useCallback(async () => {
+  const sendMessage = async () => {
+    console.log(newMessage, 'newMessage');
     if (newMessage.trim() === '') return;
     const test = await firestore()
       .collection('chats')
@@ -39,7 +40,7 @@ const ChatScreen: React.FC = ({ navigation, route }: any) => {
         timestamp: firestore.FieldValue.serverTimestamp(),
       });
     setNewMessage('');
-  }, []);
+  };
 
   return (
     <View style={styles.container}>

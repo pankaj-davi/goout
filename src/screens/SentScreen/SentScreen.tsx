@@ -5,7 +5,7 @@ import ListWrapper from '../../components/ListWrapper';
 import FriendItem from '../../components/FriendItem';
 import { WithdrawFriendRequest } from '../../utils/firebase';
 
-const SendScreen: React.FC = () => {
+const SendScreen: React.FC = (props) => {
   const { user } = useAuth();
   const {
     error,
@@ -19,11 +19,13 @@ const SendScreen: React.FC = () => {
 
   return (
     <ListWrapper
+      {...props}
       loading={loading}
       error={error}
       data={friendRequestStatus}
       renderItem={({ item }: any) => (
         <FriendItem
+          key={item.uid}
           photo={item.photo}
           name={item.name}
           onWithdraw={() => WithdrawFriendRequest(user, item)}

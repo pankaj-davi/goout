@@ -5,8 +5,8 @@ import ListWrapper from '../../components/ListWrapper';
 import FriendItem from '../../components/FriendItem';
 import { AcceptFriendRequest, RejectFriendRequest } from '../../utils/firebase';
 
-const ReceivedScreen: React.FC = () => {
-  const { user } = useAuth();
+const ReceivedScreen: React.FC = ({ ...props }) => {
+  const { user, logout } = useAuth();
   const {
     error,
     data: connections,
@@ -16,14 +16,15 @@ const ReceivedScreen: React.FC = () => {
   const friendRequestStatus = connections.filter(
     ({ requestState }) => requestState === 'ReceivedRequest'
   );
-
   return (
     <ListWrapper
+      {...props}
       loading={loading}
       error={error}
       data={friendRequestStatus}
       renderItem={({ item }) => (
         <FriendItem
+          key={item.uid}
           photo={item.photo}
           name={item.name}
           onAccept={() => AcceptFriendRequest(user, item)}

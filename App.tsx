@@ -1,23 +1,150 @@
-// App.tsx
 import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { AuthProvider, useAuth } from './src/context/AuthContext';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
+import {
+  ActivityIndicator,
+  View,
+  StyleSheet,
+  Alert,
+  Image,
+} from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
+
 import LoginScreen from './src/screens/LoginScreen/LoginScreen';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { ActivityIndicator, View, StyleSheet, Alert } from 'react-native';
-import DrawerNavigator from './src/navigation/DrawerNavigator';
+import HomeScreen from './src/screens/HomeScreen/HomeScreen';
+import RequestScreen from './src/screens/RequestScreen/RequestScreen';
+import FriendsScreen from './src/screens/FriendsScreen/FriendsScreen';
+import ChatScreen from './src/screens/ChatScreen/ChatScreen';
+
+import { AuthProvider, useAuth } from './src/context/AuthContext';
 import { requestNotificationPermission } from './src/utils/notificationPermissions';
-import { requestLocationPermission } from './src/utils/permissions'; // Import your location permission utility
+import { requestLocationPermission } from './src/utils/permissions';
 import {
   createNotificationChannel,
   setupForegroundNotificationHandler,
   setupBackgroundNotificationHandler,
 } from './src/utils/pushNotificationService';
 
-const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
 
-const MainApp: React.FC = () => {
-  const { isAuthenticated, isAuthLoading } = useAuth();
+/** Utility Functions **/
+
+// Create Drawer Icon
+const createIcon = (name: string) => {
+  return ({ color, size }: { color: string; size: number }) => (
+    <Icon name={name} color={color} size={size} />
+  );
+};
+
+// Create Back Button
+const createBackButton = (navigation: any) => (
+  <Icon
+    name="arrow-back-outline"
+    size={25}
+    color="black"
+    style={{ marginLeft: 15 }}
+    onPress={() => navigation.goBack()}
+  />
+);
+
+// Screen Options for Stack Navigator
+const createScreenOptions = (navigation: any): any => ({
+  headerLeft: () => createBackButton(navigation),
+  headerTitleAlign: 'start',
+});
+
+/** Navigators **/
+
+// Stack Navigator
+const StackNavigator = () => (
+  <Stack.Navigator>
+    <Stack.Screen
+      name="MainTabs"
+      component={TabNavigator}
+      options={{ headerShown: false }}
+    />
+    <Stack.Screen
+      name="ChatScreen"
+      component={ChatScreen}
+      options={({ navigation }) => ({
+        headerShown: true,
+        headerTitle: 'Chat',
+        ...createScreenOptions(navigation),
+      })}
+    />
+  </Stack.Navigator>
+);
+
+// Tab Navigator
+const TabNavigator = () => {
+  const { isAuthenticated } = useAuth();
+
+  if (!isAuthenticated) {
+    return (
+      <Tab.Navigator>
+        <Tab.Screen
+          name="Login"
+          component={LoginScreen}
+          options={{
+            tabBarStyle: { display: 'none' },
+            headerShown: false,
+          }}
+        />
+      </Tab.Navigator>
+    );
+  }
+
+  const tabScreens = [
+    {
+      name: 'Home',
+      component: HomeScreen,
+      icon: 'home-outline',
+      headerShown: false,
+    },
+    {
+      name: 'Requests',
+      component: RequestScreen,
+      icon: 'mail-outline',
+      headerShown: true,
+    },
+    {
+      name: 'Friends',
+      component: FriendsScreen,
+      icon: 'people-outline',
+      headerShown: true,
+    },
+    {
+      name: 'Settings',
+      component: FriendsScreen,
+      icon: 'settings-outline',
+      headerShown: true,
+    },
+  ];
+
+  return (
+    <Tab.Navigator>
+      {tabScreens.map(({ name, component, icon, headerShown }) => (
+        <Tab.Screen
+          key={name}
+          name={name}
+          component={component}
+          options={({ navigation }) => ({
+            tabBarIcon: createIcon(icon),
+            headerShown,
+            ...(headerShown ? createScreenOptions(navigation) : {}),
+          })}
+        />
+      ))}
+    </Tab.Navigator>
+  );
+};
+
+/** Main App Components **/
+
+const MainApp = () => {
+  const { isAuthLoading } = useAuth();
 
   if (isAuthLoading) {
     return (
@@ -29,35 +156,25 @@ const MainApp: React.FC = () => {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator>
-        {isAuthenticated ? (
-          <Stack.Screen
-            name="Drawer"
-            component={DrawerNavigator}
-            options={{ headerShown: false }}
-          />
-        ) : (
-          <Stack.Screen name="Login" component={LoginScreen} />
-        )}
-      </Stack.Navigator>
+      <StackNavigator />
     </NavigationContainer>
   );
 };
 
-const App: React.FC = () => {
+// Permission Initialization
+const useInitializePermissions = () => {
   useEffect(() => {
-    const initializePermissions = async () => {
-      const notificationPermissionGranted =
-        await requestNotificationPermission();
-      if (!notificationPermissionGranted) {
+    const initPermissions = async () => {
+      const notificationPermission = await requestNotificationPermission();
+      if (!notificationPermission) {
         Alert.alert(
           'Notification Permission Denied',
           'You will not receive notifications.'
         );
       }
 
-      const locationPermissionGranted = await requestLocationPermission();
-      if (!locationPermissionGranted) {
+      const locationPermission = await requestLocationPermission();
+      if (!locationPermission) {
         Alert.alert(
           'Location Permission Denied',
           'This app needs access to your location for full functionality.'
@@ -67,15 +184,21 @@ const App: React.FC = () => {
       createNotificationChannel();
 
       const unsubscribeForeground = setupForegroundNotificationHandler();
-      setupBackgroundNotificationHandler(); // Register background handler here
+      setupBackgroundNotificationHandler();
 
       return () => {
-        unsubscribeForeground(); // Unsubscribe from foreground notifications
+        unsubscribeForeground();
       };
     };
 
-    initializePermissions();
+    initPermissions();
   }, []);
+};
+
+/** App Component **/
+
+const App = () => {
+  useInitializePermissions();
 
   return (
     <AuthProvider>
@@ -83,6 +206,8 @@ const App: React.FC = () => {
     </AuthProvider>
   );
 };
+
+/** Styles **/
 
 const styles = StyleSheet.create({
   loadingContainer: {

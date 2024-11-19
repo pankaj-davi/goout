@@ -5,9 +5,10 @@ import SentScreen from '../SentScreen/SentScreen'; // Import your Sent Screen
 
 const Tab = createMaterialTopTabNavigator();
 
-const RequestScreen: React.FC = () => {
+const RequestScreen: React.FC = (props) => {
   return (
     <Tab.Navigator
+      {...props}
       initialRouteName="Sent"
       screenOptions={{
         tabBarActiveTintColor: '#000', // Minimalist active tab color
@@ -18,8 +19,8 @@ const RequestScreen: React.FC = () => {
         tabBarPressColor: 'rgba(98, 0, 234, 0.2)',
       }}
     >
-      <Tab.Screen name="Sent" component={SentScreen} />
-      <Tab.Screen name="Received" component={ReceivedScreen} />
+      <Tab.Screen name="Sent" component={SentScreen} key="sent" />
+      <Tab.Screen name="Received" component={ReceivedScreen} key="received" />
     </Tab.Navigator>
   );
 };

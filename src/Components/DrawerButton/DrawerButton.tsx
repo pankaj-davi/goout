@@ -16,7 +16,7 @@ const DrawerButton = ({
     >
       <Image
         source={{
-          uri: userPhoto || 'https://example.com/default-avatar.png', // Default avatar URL
+          uri: userPhoto,
         }}
         style={styles.userIcon}
       />

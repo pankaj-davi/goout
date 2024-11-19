@@ -143,7 +143,7 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <DrawerButton navigation={navigation} userPhoto={user.photo || ''} />
+      {/* <DrawerButton navigation={navigation} userPhoto={user.photo || ''} /> */}
       <MapView
         provider={PROVIDER_GOOGLE}
         style={styles.map}
