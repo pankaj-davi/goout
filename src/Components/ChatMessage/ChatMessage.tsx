@@ -6,6 +6,7 @@ interface ChatMessageProps {
   message: string;
   timestamp: string;
   isCurrentUser: boolean;
+  senderName: string;
 }
 
 const ChatMessage: React.FC<ChatMessageProps> = ({
@@ -13,6 +14,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
   message,
   timestamp,
   isCurrentUser,
+  senderName,
 }) => {
   return (
     <View
@@ -21,7 +23,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
         isCurrentUser ? styles.currentUser : styles.otherUser,
       ]}
     >
-      <Text style={styles.sender}>{isCurrentUser ? 'You' : sender}</Text>
+      <Text style={styles.sender}>{isCurrentUser ? 'You' : senderName}</Text>
       <Text style={styles.message}>{message}</Text>
       <Text style={styles.timestamp}>{timestamp}</Text>
     </View>
@@ -45,6 +47,8 @@ const styles = StyleSheet.create({
   },
   sender: {
     fontWeight: 'bold',
+    color: 'blue',
+    fontSize: 16,
   },
   message: {
     marginVertical: 5,

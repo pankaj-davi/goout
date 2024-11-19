@@ -1,15 +1,21 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { FlatList, View, TextInput, Button, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import {
+  FlatList,
+  View,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+} from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import ChatMessage from './../../components/ChatMessage/ChatMessage';
 import { useAuth } from '../../../src/context/AuthContext';
+import Icon from 'react-native-vector-icons/Ionicons';
 
-const ChatScreen: React.FC = ({ navigation, route }: any) => {
+const ChatScreen: React.FC = ({ route }: any) => {
   const { user } = useAuth();
   const [messages, setMessages] = useState<any[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const chatId = route.params.chatId;
-  console.log(route?.params, 'routerouterouterouterouterouteroute');
 
   useEffect(() => {
     const unsubscribe = firestore()
@@ -28,15 +34,15 @@ const ChatScreen: React.FC = ({ navigation, route }: any) => {
   }, [chatId]);
 
   const sendMessage = async () => {
-    console.log(newMessage, 'newMessage');
     if (newMessage.trim() === '') return;
-    const test = await firestore()
+    await firestore()
       .collection('chats')
       .doc(chatId)
       .collection('messages')
       .add({
         message: newMessage,
         sender: user.uid,
+        senderName: user.name,
         timestamp: firestore.FieldValue.serverTimestamp(),
       });
     setNewMessage('');
@@ -49,6 +55,7 @@ const ChatScreen: React.FC = ({ navigation, route }: any) => {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <ChatMessage
+            senderName={item.senderName}
             sender={item.sender}
             message={item.message}
             timestamp={
@@ -65,7 +72,9 @@ const ChatScreen: React.FC = ({ navigation, route }: any) => {
           onChangeText={setNewMessage}
           placeholder="Type a message"
         />
-        <Button title="Send" onPress={sendMessage} />
+        <TouchableOpacity style={styles.iconContainer} onPress={sendMessage}>
+          <Icon name="send" size={30} color="#007AFF" />
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -79,16 +88,24 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    color: '#000',
+    marginTop: 10,
   },
   input: {
     flex: 1,
+    color: '#000',
     borderColor: 'gray',
     borderWidth: 1,
     borderRadius: 20,
     paddingHorizontal: 10,
-    marginRight: 5,
-    color: '#000',
+    paddingVertical: 8, // Adjust padding for icon positioning
+    marginRight: 10,
+    paddingRight: 40, // Space for the icon inside the input
+  },
+  iconContainer: {
+    position: 'absolute',
+    right: 20, // Place icon inside the input on the right
+    top: '50%', // Vertically center the icon
+    transform: [{ translateY: -15 }],
   },
 });
 
