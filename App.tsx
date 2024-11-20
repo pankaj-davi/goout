@@ -50,8 +50,8 @@ const createBackButton = (navigation: any) => (
 );
 
 // Screen Options for Stack Navigator
-const createScreenOptions = (navigation: any): any => ({
-  headerLeft: () => createBackButton(navigation),
+const createScreenOptions = (navigation: any, showBackIcon: boolean): any => ({
+  headerLeft: () => showBackIcon && createBackButton(navigation),
   headerTitleAlign: 'start',
 });
 
@@ -71,7 +71,7 @@ const StackNavigator = () => (
       options={({ navigation }) => ({
         headerShown: true,
         headerTitle: 'Chat',
-        ...createScreenOptions(navigation),
+        ...createScreenOptions(navigation, true),
       })}
     />
   </Stack.Navigator>
@@ -86,6 +86,7 @@ const TabNavigator = () => {
       <Tab.Navigator>
         <Tab.Screen
           name="Login"
+          key="Login"
           component={LoginScreen}
           options={{
             tabBarStyle: { display: 'none' },
@@ -133,7 +134,7 @@ const TabNavigator = () => {
           options={({ navigation }) => ({
             tabBarIcon: createIcon(icon),
             headerShown,
-            ...(headerShown ? createScreenOptions(navigation) : {}),
+            ...(headerShown ? createScreenOptions(navigation, false) : {}),
           })}
         />
       ))}
