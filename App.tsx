@@ -29,9 +29,6 @@ import {
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-/** Utility Functions **/
-
-// Create Drawer Icon
 const createIcon = (name: string) => {
   return ({ color, size }: { color: string; size: number }) => (
     <Icon name={name} color={color} size={size} />
@@ -111,9 +108,9 @@ const TabNavigator = () => {
       headerShown: true,
     },
     {
-      name: 'Friends',
+      name: 'chats',
       component: FriendsScreen,
-      icon: 'people-outline',
+      icon: 'chatbox-outline',
       headerShown: true,
     },
     {
@@ -207,8 +204,6 @@ const App = () => {
     </AuthProvider>
   );
 };
-
-/** Styles **/
 
 const styles = StyleSheet.create({
   loadingContainer: {
