@@ -41,6 +41,7 @@ export interface IUser {
   familyName?: string | null;
   givenName?: string | null;
   deviceToken: string;
+  isNewUser: boolean;
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -132,6 +133,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           givenName: profile.given_name || null,
           displayName: user.displayName || null,
           photoURL: user.photoURL || profile.picture || null,
+          isNewUser: true,
           deviceToken,
         };
 

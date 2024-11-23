@@ -2,13 +2,7 @@ import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
-import {
-  ActivityIndicator,
-  View,
-  StyleSheet,
-  Alert,
-  Image,
-} from 'react-native';
+import { ActivityIndicator, View, StyleSheet, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import LoginScreen from './src/screens/LoginScreen/LoginScreen';
@@ -16,6 +10,8 @@ import HomeScreen from './src/screens/HomeScreen/HomeScreen';
 import RequestScreen from './src/screens/RequestScreen/RequestScreen';
 import FriendsScreen from './src/screens/FriendsScreen/FriendsScreen';
 import ChatScreen from './src/screens/ChatScreen/ChatScreen';
+import SettingScreen from './src/screens/SettingsScreen/SettingScreen';
+import OnboardingScreen from './src/screens/OnboardingScreen/OnboardingScreen';
 
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 import { requestNotificationPermission } from './src/utils/notificationPermissions';
@@ -76,7 +72,7 @@ const StackNavigator = () => (
 
 // Tab Navigator
 const TabNavigator = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
   if (!isAuthenticated) {
     return (
@@ -91,6 +87,18 @@ const TabNavigator = () => {
           }}
         />
       </Tab.Navigator>
+    );
+  }
+
+  if (user.isNewUser) {
+    return (
+      <Stack.Navigator>
+        <Stack.Screen
+          name="Onboarding"
+          component={OnboardingScreen}
+          options={{ headerShown: false }}
+        />
+      </Stack.Navigator>
     );
   }
 
@@ -115,7 +123,7 @@ const TabNavigator = () => {
     },
     {
       name: 'Settings',
-      component: FriendsScreen,
+      component: SettingScreen,
       icon: 'settings-outline',
       headerShown: true,
     },
