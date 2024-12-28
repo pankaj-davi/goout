@@ -7,7 +7,14 @@
     "esModuleInterop": true, // Enables emit interoperability between CommonJS and ES Modules
     "skipLibCheck": true, // Skip type checking of declaration files
     "forceConsistentCasingInFileNames": true, // Disallow inconsistently-cased references to the same file
-    "baseUrl": "./" // Base directory to resolve non-relative module names
+    "baseUrl": "./", // Base directory to resolve non-relative module names
+    "moduleResolution": "node",
+    "allowJs": true,
+    "paths": {
+      "styled-components": ["./node_modules/styled-components"],
+      "styled-components/native": ["./node_modules/styled-components/native"]
+    },
+    "types": ["node_modules/styled-components"]
   },
   "extends": "@react-native/typescript-config/tsconfig.json", // Extend from the React Native base config
   "include": [

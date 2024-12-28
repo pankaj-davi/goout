@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Alert, Image } from 'react-native';
+import { colors } from '../../theme/colors';
 import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
 import { IUser, useAuth } from '../../context/AuthContext';
@@ -38,13 +39,13 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     borderWidth: 2,
-    borderColor: 'white',
-    backgroundColor: 'black',
+    borderColor: colors.textLight,
+    backgroundColor: colors.text,
     position: 'relative',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: 'rgba(0, 0, 0, 0.3)',
+    shadowColor: colors.overlay,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -53,10 +54,10 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
   },
   currentUserMarker: {
-    borderColor: 'blue',
+    borderColor: colors.primary,
   },
   otherUserMarker: {
-    borderColor: 'green',
+    borderColor: colors.success,
   },
 });
 

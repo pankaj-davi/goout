@@ -1,6 +1,8 @@
 // screens/LoginScreen.tsx
 import React from 'react';
 import { View, StyleSheet, Text } from 'react-native';
+import { colors } from '../../theme/colors';
+import { typography } from '../../theme/typography';
 import LogoIcon from '../../assets/logo-icon.svg'; // Import your SVG
 import { useAuth } from '../../context/AuthContext';
 import { GoogleSigninButton } from '@react-native-google-signin/google-signin';
@@ -42,9 +44,9 @@ const styles = StyleSheet.create({
     marginBottom: 40, // Space between the header and button
   },
   textPart: {
-    fontSize: 60, // Font size for the text
+    fontSize: typography.fontSize['4xl'], // Font size for the text
     fontWeight: 'bold', // Bold to match the SVG logo
-    color: '#000',
+    color: colors.text,
     shadowOpacity: 0.6, // Shadow opacity
     margin: -22, // No margins for text to avoid extra space
   },

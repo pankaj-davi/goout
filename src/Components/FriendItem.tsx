@@ -1,5 +1,7 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { colors } from '../theme/colors';
+import { typography } from '../theme/typography';
 
 interface FriendItemProps {
   photo: string;
@@ -63,7 +65,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     marginBottom: 5,
     elevation: 5,
-    shadowColor: '#000',
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 6,
@@ -81,21 +83,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   name: {
-    fontSize: 18,
-    color: '#000',
+    fontSize: typography.fontSize.lg,
+    color: colors.text,
   },
   buttonContainer: {
     flexDirection: 'row',
   },
   acceptButton: {
-    backgroundColor: '#007BFF',
+    backgroundColor: colors.primary,
     paddingVertical: 5,
     paddingHorizontal: 10,
     borderRadius: 20,
     marginRight: 10,
   },
   acceptButtonText: {
-    color: '#fff',
+    color: colors.textLight,
     fontSize: 12,
   },
   rejectButton: {
@@ -103,12 +105,12 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     paddingHorizontal: 10,
     borderRadius: 20,
-    borderColor: '#007BFF',
+    borderColor: colors.primary,
     borderWidth: 1,
     marginRight: 10,
   },
   rejectButtonText: {
-    color: '#007BFF',
+    color: colors.primary,
     fontSize: 12,
   },
   withdrawButton: {
@@ -116,11 +118,11 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     paddingHorizontal: 10,
     borderRadius: 20,
-    borderColor: '#FF0000',
+    borderColor: colors.error,
     borderWidth: 1,
   },
   withdrawButtonText: {
-    color: '#FF0000',
+    color: colors.error,
     fontSize: 12,
   },
 });

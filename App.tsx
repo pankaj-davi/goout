@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { ThemeProvider } from './src/components/ThemeProvider';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -90,17 +91,17 @@ const TabNavigator = () => {
     );
   }
 
-  if (user.isNewUser) {
-    return (
-      <Stack.Navigator>
-        <Stack.Screen
-          name="Onboarding"
-          component={OnboardingScreen}
-          options={{ headerShown: false }}
-        />
-      </Stack.Navigator>
-    );
-  }
+  // if (user.isNewUser) {
+  //   return (
+  //     <Stack.Navigator>
+  //       <Stack.Screen
+  //         name="Onboarding"
+  //         component={OnboardingScreen}
+  //         options={{ headerShown: false }}
+  //       />
+  //     </Stack.Navigator>
+  //   );
+  // }
 
   const tabScreens = [
     {
@@ -208,7 +209,9 @@ const App = () => {
 
   return (
     <AuthProvider>
-      <MainApp />
+      <ThemeProvider>
+        <MainApp />
+      </ThemeProvider>
     </AuthProvider>
   );
 };

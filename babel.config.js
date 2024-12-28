@@ -12,6 +12,7 @@ if (!fs.existsSync(path.resolve(__dirname, envFile))) {
 module.exports = {
   presets: ['module:metro-react-native-babel-preset'],
   plugins: [
+    'babel-plugin-styled-components',
     'react-native-reanimated/plugin',
     ['@babel/plugin-transform-private-methods', { loose: true }],
     ['@babel/plugin-transform-class-properties', { loose: true }],

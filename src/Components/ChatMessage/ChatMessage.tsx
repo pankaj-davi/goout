@@ -1,5 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { colors } from '../../theme/colors';
+import { typography } from '../../theme/typography';
 
 interface ChatMessageProps {
   sender: string;
@@ -39,24 +41,24 @@ const styles = StyleSheet.create({
   },
   currentUser: {
     alignSelf: 'flex-end',
-    backgroundColor: '#DCF8C6',
+    backgroundColor: colors.messageBubbleOwn,
   },
   otherUser: {
     alignSelf: 'flex-start',
-    backgroundColor: '#E1E1E1',
+    backgroundColor: colors.messageBubble,
   },
   sender: {
     fontWeight: 'bold',
-    color: 'blue',
-    fontSize: 16,
+    color: colors.primary,
+    fontSize: typography.fontSize.base,
   },
   message: {
     marginVertical: 5,
-    color: '#000',
+    color: colors.text,
   },
   timestamp: {
-    fontSize: 10,
-    color: 'grey',
+    fontSize: typography.fontSize.xs,
+    color: colors.textTertiary,
     alignSelf: 'flex-end',
   },
 });
