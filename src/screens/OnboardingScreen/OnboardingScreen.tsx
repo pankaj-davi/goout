@@ -313,9 +313,9 @@ const styles = StyleSheet.create({
     height: '100%',
     padding: 15,
     paddingTop: 40,
+    backgroundColor: colors.backgroundSecondary,
   },
   content: {
-    flex: 0.5,
     width: '100%',
     color: '#000',
   },
@@ -348,8 +348,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingBottom: 20,
+    marginTop: 20,
   },
   button: {
     backgroundColor: colors.primary,
@@ -380,7 +379,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   selectedOption: {
-    backgroundColor: '#007BFF',
+    backgroundColor: colors.primary,
   },
   optionText: {
     fontSize: 16,
