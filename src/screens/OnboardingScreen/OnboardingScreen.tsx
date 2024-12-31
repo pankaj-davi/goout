@@ -11,7 +11,7 @@ import {
 import { useForm, Controller } from 'react-hook-form';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
-import { colors } from '../../theme/colors';
+import { theme } from '../../theme/index';
 
 interface UserDetails {
   name: string;
@@ -313,7 +313,6 @@ const styles = StyleSheet.create({
     height: '100%',
     padding: 15,
     paddingTop: 40,
-    backgroundColor: colors.backgroundSecondary,
   },
   content: {
     width: '100%',
@@ -321,7 +320,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 20,
-    color: colors.textSecondary,
+    color: theme.colors.textSecondary,
     textAlign: 'left',
     marginBottom: 6,
     fontWeight: '600',
@@ -329,18 +328,19 @@ const styles = StyleSheet.create({
   input: {
     width: '100%',
     height: 50,
-    borderColor: 'gray',
+    borderColor: theme.colors.border,
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 10,
     justifyContent: 'center',
-    color: '#000',
+    color: theme.colors.text,
+    backgroundColor: '#fff',
   },
   errorInput: {
-    borderColor: 'red',
+    borderColor: theme.colors.error,
   },
   errorText: {
-    color: 'red',
+    color: theme.colors.error,
     fontSize: 12,
     marginBottom: 10,
   },
@@ -351,7 +351,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   button: {
-    backgroundColor: colors.primary,
+    backgroundColor: theme.colors.primary,
     padding: 18,
     borderRadius: 30,
     alignItems: 'center',
@@ -359,7 +359,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   buttonText: {
-    color: '#fff',
+    color: theme.colors.textLight,
     fontWeight: 'bold',
   },
   optionContainer: {
@@ -375,18 +375,18 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 10,
     borderRadius: 25,
-    backgroundColor: '#E0E0E0',
+    backgroundColor: theme.colors.backgroundSecondary,
     alignItems: 'center',
   },
   selectedOption: {
-    backgroundColor: colors.primary,
+    backgroundColor: theme.colors.primary,
   },
   optionText: {
     fontSize: 16,
-    color: colors.textSecondary,
+    color: theme.colors.textSecondary,
   },
   selectedOptionText: {
-    color: '#fff',
+    color: theme.colors.textLight,
   },
 });
 
