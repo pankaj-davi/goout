@@ -26,7 +26,6 @@ interface UserDetails {
   privacy: string;
   lifestyle: string;
   workLifeBalance: string;
-  culturalAppreciation: string;
 }
 
 const OnboardingScreen: React.FC = () => {
@@ -51,7 +50,6 @@ const OnboardingScreen: React.FC = () => {
       privacy: '',
       lifestyle: '',
       workLifeBalance: '',
-      culturalAppreciation: '',
     },
     mode: 'onTouched',
     shouldFocusError: true,
@@ -65,20 +63,6 @@ const OnboardingScreen: React.FC = () => {
   const onSubmit = (data: UserDetails) => {
     console.log('User Details:', data);
     Alert.alert('Form Submitted', JSON.stringify(data, null, 2));
-  };
-
-  const handleNext = async () => {
-    const isValid = await trigger();
-    if (isValid) {
-      if (step < 7) setStep(step + 1);
-    } else {
-      const firstError = Object.keys(errors)[0];
-      if (firstError) setFocus(firstError as any);
-    }
-  };
-
-  const handlePrevious = () => {
-    if (step > 1) setStep(step - 1);
   };
 
   const onDateChange = (event: any, selectedDate: Date | undefined) => {
@@ -230,7 +214,7 @@ const OnboardingScreen: React.FC = () => {
                 <>
                   <View style={styles.checkboxContainer}>
                     {[
-                      'professional',
+                      'Professional',
                       'Friendship',
                       'Collaboration',
                       'Mentorship',
@@ -356,47 +340,8 @@ const OnboardingScreen: React.FC = () => {
                 {errors.workLifeBalance.message}
               </Text>
             )}
-
-            {/* Cultural Appreciation */}
-            <Text style={styles.subtitle}>Cultural Appreciation</Text>
-            <Controller
-              control={control}
-              name="culturalAppreciation"
-              rules={{
-                required: 'Please select your cultural appreciation preference',
-              }}
-              render={({ field: { onChange, value } }) => (
-                <View style={styles.checkboxContainer}>
-                  {['Shared', 'Open to Diversity'].map((option) => (
-                    <TouchableOpacity
-                      key={option}
-                      style={[
-                        styles.checkboxItem,
-                        value === option && styles.selectedCheckboxItem,
-                      ]}
-                      onPress={() => onChange(option)}
-                    >
-                      <Text
-                        style={[
-                          styles.checkboxText,
-                          value === option && styles.selectedCheckboxText,
-                        ]}
-                      >
-                        {option}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              )}
-            />
-            {errors.culturalAppreciation && (
-              <Text style={styles.errorText}>
-                {errors.culturalAppreciation.message}
-              </Text>
-            )}
           </View>
         );
-      // Add more steps here (like purpose, languages, etc.)
       default:
         return null;
     }
@@ -407,24 +352,25 @@ const OnboardingScreen: React.FC = () => {
       <View style={styles.content}>{renderStep()}</View>
       <View style={styles.buttonContainer}>
         <TouchableOpacity
-          style={[styles.button, step === 1 && styles.disabledButton]}
-          onPress={handlePrevious}
-          disabled={step === 1}
+          style={styles.button}
+          onPress={async () => {
+            const isValid = await trigger();
+            if (isValid) {
+              if (step < 7) {
+                setStep(step + 1);
+              } else {
+                handleSubmit(onSubmit)();
+              }
+            } else {
+              const firstError = Object.keys(errors)[0];
+              if (firstError) setFocus(firstError as any);
+            }
+          }}
         >
-          <Text style={styles.buttonText}>Previous</Text>
+          <Text style={styles.buttonText}>
+            {step === 7 ? 'Submit' : 'Continue'}
+          </Text>
         </TouchableOpacity>
-        {step === 7 ? (
-          <TouchableOpacity
-            style={styles.button}
-            onPress={handleSubmit(onSubmit)}
-          >
-            <Text style={styles.buttonText}>Submit</Text>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity style={styles.button} onPress={handleNext}>
-            <Text style={styles.buttonText}>Next</Text>
-          </TouchableOpacity>
-        )}
       </View>
     </View>
   );
@@ -473,21 +419,18 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingBottom: 20,
   },
   button: {
     backgroundColor: '#007BFF',
-    padding: 10,
-    borderRadius: 8,
+    padding: 18,
+    borderRadius: 30,
     alignItems: 'center',
     justifyContent: 'center',
-    width: 90,
-  },
-  disabledButton: {
-    backgroundColor: '#B0C4DE',
+    width: '100%',
   },
   buttonText: {
     color: '#fff',
