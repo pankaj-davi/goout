@@ -19,11 +19,6 @@ interface UserDetails {
   dob: string;
   gender: string;
   purpose: string[];
-  languages: string[];
-  interests: string[];
-  personality: string;
-  funFact: string;
-  privacy: string;
   lifestyle: string;
   workLifeBalance: string;
 }
@@ -43,11 +38,6 @@ const OnboardingScreen: React.FC = () => {
       dob: '',
       gender: '',
       purpose: [],
-      languages: [],
-      interests: [],
-      personality: '',
-      funFact: '',
-      privacy: '',
       lifestyle: '',
       workLifeBalance: '',
     },
@@ -86,277 +76,219 @@ const OnboardingScreen: React.FC = () => {
     setShowDatePicker(false);
   };
 
-  const renderStep = () => {
+  const renderStepContent = () => {
     switch (step) {
       case 1:
-        return (
-          <View>
-            <Text style={styles.subtitle}>Name</Text>
-            <Controller
-              control={control}
-              name="name"
-              rules={{ required: 'Name is required' }}
-              render={({ field: { onChange, value } }) => (
-                <>
-                  <TextInput
-                    ref={nameInputRef}
-                    style={[styles.input, errors.name && styles.errorInput]}
-                    placeholder="Enter name"
-                    value={getValues('name')}
-                    onChangeText={(text) => {
-                      onChange(text);
-                      trigger('name');
-                    }}
-                    placeholderTextColor="#B0B0B0"
-                  />
-                  {errors.name && (
-                    <Text style={styles.errorText}>{errors.name.message}</Text>
-                  )}
-                </>
-              )}
-            />
-          </View>
-        );
+        return renderNameInput();
       case 2:
-        return (
-          <View>
-            <Text style={styles.subtitle}>DOB</Text>
-            <Controller
-              control={control}
-              name="dob"
-              rules={{
-                required: 'Date of birth is required',
-                validate: (value) => {
-                  const now = new Date();
-                  const dob = new Date(value);
-                  if (dob > now) return 'Date of birth cannot be in the future';
-                  const age = now.getFullYear() - dob.getFullYear();
-                  if (age > 120) return 'Age cannot be greater than 120 years';
-                  return true;
-                },
-              }}
-              render={({ field: { value } }) => (
-                <>
-                  <TouchableOpacity
-                    onPress={() => setShowDatePicker(true)}
-                    style={[styles.input, errors.dob && styles.errorInput]}
-                  >
-                    <Text style={{ color: value ? '#000' : '#B0B0B0' }}>
-                      {getValues('dob') || 'Select Date of Birth'}
-                    </Text>
-                  </TouchableOpacity>
-                  {errors.dob && (
-                    <Text style={styles.errorText}>{errors.dob.message}</Text>
-                  )}
-                  {showDatePicker && (
-                    <DateTimePicker
-                      value={date}
-                      mode="date"
-                      display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                      onChange={onDateChange}
-                    />
-                  )}
-                </>
-              )}
-            />
-          </View>
-        );
+        return renderDateOfBirthInput();
       case 3:
-        return (
-          <View>
-            <Text style={styles.subtitle}>Gender</Text>
-            <Controller
-              control={control}
-              name="gender"
-              rules={{ required: 'Gender is required' }}
-              render={({ field: { onChange, value } }) => (
-                <View style={styles.genderContainer}>
-                  {['Male', 'Female'].map((genderOption) => (
-                    <TouchableOpacity
-                      key={genderOption}
-                      style={[
-                        styles.genderButton,
-                        value === genderOption && styles.selectedGender,
-                      ]}
-                      onPress={() => onChange(genderOption)}
-                    >
-                      <Text
-                        style={[
-                          styles.genderText,
-                          value === genderOption && styles.selectedGenderText,
-                        ]}
-                      >
-                        {genderOption}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              )}
-            />
-            {errors.gender && (
-              <Text style={styles.errorText}>{errors.gender.message}</Text>
-            )}
-          </View>
-        );
+        return renderGenderSelection();
       case 4:
-        return (
-          <View>
-            <Text style={styles.subtitle}>Purpose for Connecting</Text>
-            <Controller
-              control={control}
-              name="purpose"
-              rules={{
-                required: 'Please select at least one purpose for connecting',
-                validate: (value) =>
-                  value.length > 0 || 'At least one purpose is required',
-              }}
-              render={({ field: { onChange, value } }) => (
-                <>
-                  <View style={styles.checkboxContainer}>
-                    {[
-                      'Professional',
-                      'Friendship',
-                      'Collaboration',
-                      'Mentorship',
-                      'Romantic',
-                    ].map((purpose) => (
-                      <View key={purpose} style={styles.checkboxItem}>
-                        <TouchableOpacity
-                          onPress={() => {
-                            const newValue = !value.includes(purpose)
-                              ? [...value, purpose]
-                              : value.filter((item) => item !== purpose);
-                            onChange(newValue);
-                          }}
-                          style={{ flexDirection: 'row', alignItems: 'center' }}
-                        >
-                          <CheckBox
-                            value={value.includes(purpose)}
-                            onValueChange={(newValue) => {
-                              const newPurpose = newValue
-                                ? [...value, purpose]
-                                : value.filter((item) => item !== purpose);
-                              onChange(newPurpose); // Update the form state
-                            }}
-                            tintColors={{ true: '#007BFF', false: 'gray' }}
-                          />
-                          <Text
-                            style={[
-                              styles.checkboxText,
-                              value.includes(purpose) &&
-                                styles.selectedCheckboxText,
-                            ]}
-                          >
-                            {purpose}
-                          </Text>
-                        </TouchableOpacity>
-                      </View>
-                    ))}
-                  </View>
-                  {errors.purpose && (
-                    <Text style={styles.errorText}>
-                      {errors.purpose.message}
-                    </Text>
-                  )}
-                </>
-              )}
-            />
-          </View>
-        );
-      // Inside renderStep, add this for step 5:
+        return renderLifestylePreferences();
       case 5:
-        return (
-          <View>
-            <Text style={styles.subtitle}>Contextual Factors</Text>
-
-            {/* Lifestyle Preferences */}
-            <Text style={styles.subtitle}>Lifestyle Preferences</Text>
-            <Controller
-              control={control}
-              name="lifestyle"
-              rules={{ required: 'Please select your lifestyle preference' }}
-              render={({ field: { onChange, value } }) => (
-                <View style={styles.checkboxContainer}>
-                  {['Night Owl', 'Early Bird'].map((preference) => (
-                    <TouchableOpacity
-                      key={preference}
-                      style={[
-                        styles.checkboxItem,
-                        value === preference && styles.selectedCheckboxItem,
-                      ]}
-                      onPress={() => onChange(preference)}
-                    >
-                      <Text
-                        style={[
-                          styles.checkboxText,
-                          value === preference && styles.selectedCheckboxText,
-                        ]}
-                      >
-                        {preference}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              )}
-            />
-            {errors.lifestyle && (
-              <Text style={styles.errorText}>{errors.lifestyle.message}</Text>
-            )}
-
-            {/* Work-Life Balance */}
-            <Text style={styles.subtitle}>Work-Life Balance</Text>
-            <Controller
-              control={control}
-              name="workLifeBalance"
-              rules={{
-                required: 'Please select your work-life balance preference',
-              }}
-              render={({ field: { onChange, value } }) => (
-                <View style={styles.checkboxContainer}>
-                  {['Career-driven', 'Relaxed'].map((balance) => (
-                    <TouchableOpacity
-                      key={balance}
-                      style={[
-                        styles.checkboxItem,
-                        value === balance && styles.selectedCheckboxItem,
-                      ]}
-                      onPress={() => onChange(balance)}
-                    >
-                      <Text
-                        style={[
-                          styles.checkboxText,
-                          value === balance && styles.selectedCheckboxText,
-                        ]}
-                      >
-                        {balance}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              )}
-            />
-            {errors.workLifeBalance && (
-              <Text style={styles.errorText}>
-                {errors.workLifeBalance.message}
-              </Text>
-            )}
-          </View>
-        );
+        return renderWorkLifeBalancePreferences();
       default:
         return null;
     }
   };
 
+  const renderNameInput = () => (
+    <View>
+      <Text style={styles.subtitle}>Name</Text>
+      <Controller
+        control={control}
+        name="name"
+        rules={{ required: 'Name is required' }}
+        render={({ field: { onChange, value } }) => (
+          <>
+            <TextInput
+              ref={nameInputRef}
+              style={[styles.input, errors.name && styles.errorInput]}
+              placeholder="Enter name"
+              value={value}
+              onChangeText={(text) => {
+                onChange(text);
+                trigger('name');
+              }}
+              placeholderTextColor="#B0B0B0"
+            />
+            {errors.name && (
+              <Text style={styles.errorText}>{errors.name.message}</Text>
+            )}
+          </>
+        )}
+      />
+    </View>
+  );
+
+  const renderDateOfBirthInput = () => (
+    <View>
+      <Text style={styles.subtitle}>DOB</Text>
+      <Controller
+        control={control}
+        name="dob"
+        rules={{
+          required: 'Date of birth is required',
+          validate: (value) => {
+            const now = new Date();
+            const dob = new Date(value);
+            if (dob > now) return 'Date of birth cannot be in the future';
+            const age = now.getFullYear() - dob.getFullYear();
+            if (age > 100) return 'Age cannot be greater than 120 years';
+            return true;
+          },
+        }}
+        render={({ field: { value } }) => (
+          <>
+            <TouchableOpacity
+              onPress={() => setShowDatePicker(true)}
+              style={[styles.input, errors.dob && styles.errorInput]}
+            >
+              <Text style={{ color: value ? '#000' : '#B0B0B0' }}>
+                {value || 'Select Date of Birth'}
+              </Text>
+            </TouchableOpacity>
+            {errors.dob && (
+              <Text style={styles.errorText}>{errors.dob.message}</Text>
+            )}
+            {showDatePicker && (
+              <DateTimePicker
+                value={date}
+                mode="date"
+                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                onChange={onDateChange}
+              />
+            )}
+          </>
+        )}
+      />
+    </View>
+  );
+
+  const renderGenderSelection = () => (
+    <View>
+      <Text style={styles.subtitle}>Gender</Text>
+      <Controller
+        control={control}
+        name="gender"
+        rules={{ required: 'Gender is required' }}
+        render={({ field: { onChange, value } }) => (
+          <View style={styles.optionContainer}>
+            {['Male', 'Female'].map((option) => (
+              <TouchableOpacity
+                key={option}
+                style={[
+                  styles.optionButton,
+                  value === option && styles.selectedOption,
+                ]}
+                onPress={() => onChange(option)}
+              >
+                <Text
+                  style={[
+                    styles.optionText,
+                    value === option && styles.selectedOptionText,
+                  ]}
+                >
+                  {option}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+      />
+      {errors.gender && (
+        <Text style={styles.errorText}>{errors.gender.message}</Text>
+      )}
+    </View>
+  );
+
+  const renderLifestylePreferences = () => (
+    <View>
+      <Text style={styles.subtitle}>Lifestyle Preferences</Text>
+      <Controller
+        control={control}
+        name="lifestyle"
+        rules={{ required: 'Please select your lifestyle preference' }}
+        render={({ field: { onChange, value } }) => (
+          <View style={styles.optionContainer}>
+            {['Night Owl', 'Early Bird'].map((option) => (
+              <TouchableOpacity
+                key={option}
+                style={[
+                  styles.optionButton,
+                  value === option && styles.selectedOption,
+                ]}
+                onPress={() => onChange(option)}
+              >
+                <Text
+                  style={[
+                    styles.optionText,
+                    value === option && styles.selectedOptionText,
+                  ]}
+                >
+                  {option}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+      />
+      {errors.lifestyle && (
+        <Text style={styles.errorText}>{errors.lifestyle.message}</Text>
+      )}
+    </View>
+  );
+
+  const renderWorkLifeBalancePreferences = () => (
+    <View>
+      <Text style={styles.subtitle}>Work-Life Balance</Text>
+      <Controller
+        control={control}
+        name="workLifeBalance"
+        rules={{
+          required: 'Please select your work-life balance preference',
+        }}
+        render={({ field: { onChange, value } }) => (
+          <View style={styles.optionContainer}>
+            {['Career-driven', 'Relaxed'].map((option) => (
+              <TouchableOpacity
+                key={option}
+                style={[
+                  styles.optionButton,
+                  value === option && styles.selectedOption,
+                ]}
+                onPress={() => onChange(option)}
+              >
+                <Text
+                  style={[
+                    styles.optionText,
+                    value === option && styles.selectedOptionText,
+                  ]}
+                >
+                  {option}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+      />
+      {errors.workLifeBalance && (
+        <Text style={styles.errorText}>{errors.workLifeBalance.message}</Text>
+      )}
+    </View>
+  );
+
   return (
     <View style={styles.container}>
-      <View style={styles.content}>{renderStep()}</View>
+      <View style={styles.content}>{renderStepContent()}</View>
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={styles.button}
           onPress={async () => {
             const isValid = await trigger();
             if (isValid) {
-              if (step < 7) {
+              if (step < 5) {
                 setStep(step + 1);
               } else {
                 handleSubmit(onSubmit)();
@@ -368,7 +300,7 @@ const OnboardingScreen: React.FC = () => {
           }}
         >
           <Text style={styles.buttonText}>
-            {step === 7 ? 'Submit' : 'Continue'}
+            {step === 5 ? 'Submit' : 'Continue'}
           </Text>
         </TouchableOpacity>
       </View>
@@ -385,12 +317,6 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     width: '100%',
-    color: '#000',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
     color: '#000',
   },
   subtitle: {
@@ -425,7 +351,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   button: {
-    backgroundColor: '#007BFF',
+    backgroundColor: colors.primary,
     padding: 18,
     borderRadius: 30,
     alignItems: 'center',
@@ -436,53 +362,31 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
   },
-  genderContainer: {
+  optionContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
     alignItems: 'flex-start',
     marginBottom: 10,
     columnGap: 10,
+    width: '100%',
+    marginTop: 12,
   },
-  genderButton: {
+  optionButton: {
+    flex: 1,
     padding: 10,
     borderRadius: 25,
     backgroundColor: '#E0E0E0',
-    width: '30%',
     alignItems: 'center',
   },
-  selectedGender: {
+  selectedOption: {
     backgroundColor: '#007BFF',
   },
-  genderText: {
+  optionText: {
     fontSize: 16,
     color: '#000',
   },
-  selectedGenderText: {
+  selectedOptionText: {
     color: '#fff',
-  },
-  checkboxContainer: {
-    // flexDirection: 'row',
-    // flexWrap: 'wrap',
-    // justifyContent: 'space-between',
-  },
-  checkboxItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '100%',
-    paddingVertical: 10,
-  },
-  checkboxText: {
-    fontSize: 16,
-    marginLeft: 8,
-    color: '#000',
-  },
-  selectedCheckboxText: {
-    fontWeight: 'bold',
-  },
-  selectedCheckboxItem: {
-    backgroundColor: '#D3E4FF', // Light blue background when selected
-    borderColor: '#007BFF', // Blue border when selected
-    borderWidth: 2,
   },
 });
 
