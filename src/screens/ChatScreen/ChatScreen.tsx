@@ -56,7 +56,6 @@ const ChatScreen: React.FC = ({ route }: any) => {
         renderItem={({ item }) => (
           <ChatMessage
             senderName={item.senderName}
-            sender={item.sender}
             message={item.message}
             timestamp={
               item.timestamp ? item.timestamp.toDate().toLocaleString() : ''

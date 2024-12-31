@@ -12,6 +12,8 @@ import { useForm, Controller } from 'react-hook-form';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import CheckBox from '@react-native-community/checkbox';
 
+import { colors } from '../../theme/colors';
+
 interface UserDetails {
   name: string;
   dob: string;
@@ -105,7 +107,7 @@ const OnboardingScreen: React.FC = () => {
       case 1:
         return (
           <View>
-            <Text style={styles.subtitle}>your name</Text>
+            <Text style={styles.subtitle}>Name</Text>
             <Controller
               control={control}
               name="name"
@@ -115,7 +117,7 @@ const OnboardingScreen: React.FC = () => {
                   <TextInput
                     ref={nameInputRef}
                     style={[styles.input, errors.name && styles.errorInput]}
-                    placeholder="Enter your name"
+                    placeholder="Enter name"
                     value={getValues('name')}
                     onChangeText={(text) => {
                       onChange(text);
@@ -134,7 +136,7 @@ const OnboardingScreen: React.FC = () => {
       case 2:
         return (
           <View>
-            <Text style={styles.subtitle}>What is your date of birth?</Text>
+            <Text style={styles.subtitle}>DOB</Text>
             <Controller
               control={control}
               name="dob"
@@ -178,7 +180,7 @@ const OnboardingScreen: React.FC = () => {
       case 3:
         return (
           <View>
-            <Text style={styles.subtitle}>Select your gender</Text>
+            <Text style={styles.subtitle}>Gender</Text>
             <Controller
               control={control}
               name="gender"
@@ -402,10 +404,7 @@ const OnboardingScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.title}>Step {step} of 7</Text>
-        {renderStep()}
-      </View>
+      <View style={styles.content}>{renderStep()}</View>
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={[styles.button, step === 1 && styles.disabledButton]}
@@ -449,10 +448,10 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   subtitle: {
-    fontSize: 18,
-    color: '#000',
+    fontSize: 20,
+    color: colors.textSecondary,
     textAlign: 'left',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   input: {
     width: '100%',
@@ -461,7 +460,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 10,
-    marginBottom: 10,
     justifyContent: 'center',
     color: '#000',
   },

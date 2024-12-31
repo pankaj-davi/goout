@@ -34,7 +34,7 @@ const FriendsScreen: React.FC = () => {
     <ListWrapper
       loading={loading}
       error={error}
-      data={[...friends, ...friends]}
+      data={friends}
       renderItem={renderItem}
       keyExtractor={(item) => item.uid}
     />

@@ -46,7 +46,7 @@ export const colors = {
   // Chat colors
   messageBubble: '#F3F4F6',
   messageBubbleSent: '#007AFF',
-  messageBubbleOwn: '#FF4B6E',
+  messageBubbleOwn: '#f5f5f5',
   messageText: '#1A1A1A',
   messageTextOwn: '#FFFFFF',
 
@@ -55,7 +55,7 @@ export const colors = {
   divider: '#EEEEEE',
   shadow: '#000000',
   overlay: 'rgba(0, 0, 0, 0.5)',
-  
+
   // Interactive states
   buttonHover: '#FF6B88',
   buttonPressed: '#E63054',
@@ -65,5 +65,5 @@ export const colors = {
   like: '#FF4B6E',
   match: '#FF9500',
   online: '#34C759',
-  offline: '#999999'
-}
+  offline: '#999999',
+};

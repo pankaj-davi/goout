@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { colors } from '../../theme/colors';
+import { theme } from '../../theme/index';
 import { typography } from '../../theme/typography';
 
 interface ChatMessageProps {
-  sender: string;
   message: string;
   timestamp: string;
   isCurrentUser: boolean;
@@ -12,7 +12,6 @@ interface ChatMessageProps {
 }
 
 const ChatMessage: React.FC<ChatMessageProps> = ({
-  sender,
   message,
   timestamp,
   isCurrentUser,
@@ -21,8 +20,8 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
   return (
     <View
       style={[
-        styles.container,
-        isCurrentUser ? styles.currentUser : styles.otherUser,
+        [styles.container, theme.shadows.md],
+        isCurrentUser ? [styles.currentUser] : styles.otherUser,
       ]}
     >
       <Text style={styles.sender}>{isCurrentUser ? 'You' : senderName}</Text>
