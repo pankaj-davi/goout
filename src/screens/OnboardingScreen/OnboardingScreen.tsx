@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import CheckBox from '@react-native-community/checkbox';
 
 import { colors } from '../../theme/colors';
 
@@ -18,7 +17,6 @@ interface UserDetails {
   name: string;
   dob: string;
   gender: string;
-  purpose: string[];
   lifestyle: string;
   workLifeBalance: string;
 }
@@ -37,7 +35,6 @@ const OnboardingScreen: React.FC = () => {
       name: '',
       dob: '',
       gender: '',
-      purpose: [],
       lifestyle: '',
       workLifeBalance: '',
     },
@@ -124,7 +121,7 @@ const OnboardingScreen: React.FC = () => {
 
   const renderDateOfBirthInput = () => (
     <View>
-      <Text style={styles.subtitle}>DOB</Text>
+      <Text style={styles.subtitle}>Date of birth</Text>
       <Controller
         control={control}
         name="dob"
@@ -310,12 +307,15 @@ const OnboardingScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    margin: 15,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '100%',
+    padding: 15,
     paddingTop: 40,
   },
   content: {
-    flex: 1,
+    flex: 0.5,
     width: '100%',
     color: '#000',
   },
@@ -324,6 +324,7 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     textAlign: 'left',
     marginBottom: 6,
+    fontWeight: '600',
   },
   input: {
     width: '100%',
@@ -383,7 +384,7 @@ const styles = StyleSheet.create({
   },
   optionText: {
     fontSize: 16,
-    color: '#000',
+    color: colors.textSecondary,
   },
   selectedOptionText: {
     color: '#fff',
