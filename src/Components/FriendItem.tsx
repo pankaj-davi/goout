@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   rejectButtonText: {
-    color: colors.primary,
+    color: colors.primaryLight,
     fontSize: 12,
   },
   withdrawButton: {

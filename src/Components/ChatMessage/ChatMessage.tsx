@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
   },
   sender: {
     fontWeight: 'bold',
-    color: colors.primary,
+    color: colors.primaryLight,
     fontSize: typography.fontSize.sm,
   },
   message: {

@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
   },
   currentUserMarker: {
-    borderColor: colors.primary,
+    borderColor: colors.primaryLight,
   },
   otherUserMarker: {
     borderColor: colors.success,

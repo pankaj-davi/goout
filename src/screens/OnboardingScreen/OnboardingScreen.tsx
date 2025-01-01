@@ -14,6 +14,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { theme } from '../../theme/index';
 import { IUser, useAuth } from '../../context/AuthContext';
 import { updateUserProfileToFirestore } from '../../services/firebase/firebase';
+import CheckBox from '@react-native-community/checkbox';
 
 export interface UserOnboardDetails {
   name: string;
@@ -21,11 +22,12 @@ export interface UserOnboardDetails {
   gender: string;
   lifestyle: string;
   workLifeBalance: string;
+  purpose: string[];
 }
 
 const OnboardingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const { setUser, logout, user } = useAuth();
-  const [step, setStep] = useState<number>(1);
+  const [step, setStep] = useState<number>(6);
   const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
   const [date, setDate] = useState<Date>(new Date());
 
@@ -44,13 +46,12 @@ const OnboardingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       gender: '',
       lifestyle: '',
       workLifeBalance: '',
+      purpose: [],
     },
     mode: 'onTouched',
     shouldFocusError: true,
   });
   const nameInputRef = useRef<TextInput | null>(null);
-
-  // apply use callback on this onSubmit function based in the user
 
   const onSubmit = async (userOnboardDetails: UserOnboardDetails) => {
     try {
@@ -95,6 +96,8 @@ const OnboardingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         return renderLifestylePreferences();
       case 5:
         return renderWorkLifeBalancePreferences();
+      case 6:
+        return renderPurposeSelection();
       default:
         return null;
     }
@@ -286,6 +289,64 @@ const OnboardingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     </View>
   );
 
+  const renderPurposeSelection = () => (
+    <View>
+      <Text style={styles.subtitle}>Purpose for Connecting</Text>
+      <Controller
+        control={control}
+        name="purpose"
+        rules={{
+          required: 'Please select at least one purpose for connecting',
+          validate: (value) =>
+            value.length > 0 || 'At least one purpose is required',
+        }}
+        render={({ field: { onChange, value } }) => (
+          <>
+            <View style={styles.checkboxContainer}>
+              {[
+                'Professional',
+                'Friendship',
+                'Collaboration',
+                'Mentorship',
+                'Romantic',
+              ].map((purpose) => (
+                <TouchableOpacity
+                  key={purpose}
+                  style={styles.checkboxItem}
+                  onPress={() => {
+                    const newValue = !value.includes(purpose);
+                    const newPurpose = newValue
+                      ? [...value, purpose]
+                      : value.filter((item) => item !== purpose);
+                    onChange(newPurpose);
+                  }}
+                >
+                  <CheckBox
+                    value={value.includes(purpose)}
+                    onValueChange={(newValue) => {
+                      const newPurpose = newValue
+                        ? [...value, purpose]
+                        : value.filter((item) => item !== purpose);
+                      onChange(newPurpose);
+                    }}
+                    style={[
+                      styles.checkbox,
+                      value.includes(purpose) && styles.checkboxChecked,
+                    ]}
+                  />
+                  <Text style={styles.checkboxLabel}>{purpose}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+            {errors.purpose && (
+              <Text style={styles.errorText}>{errors.purpose.message}</Text>
+            )}
+          </>
+        )}
+      />
+    </View>
+  );
+
   return (
     <View style={styles.container}>
       <View style={styles.content}>{renderStepContent()}</View>
@@ -295,7 +356,7 @@ const OnboardingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           onPress={async () => {
             const isValid = await trigger();
             if (isValid) {
-              if (step < 5) {
+              if (step < 6) {
                 setStep(step + 1);
               } else {
                 handleSubmit(onSubmit)();
@@ -307,7 +368,7 @@ const OnboardingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           }}
         >
           <Text style={styles.buttonText}>
-            {step === 5 ? 'Submit' : 'Continue'}
+            {step === 6 ? 'Submit' : 'Continue'}
           </Text>
         </TouchableOpacity>
       </View>
@@ -397,6 +458,34 @@ const styles = StyleSheet.create({
   },
   selectedOptionText: {
     color: theme.colors.textLight,
+  },
+  checkboxContainer: {
+    flexDirection: 'column',
+    marginTop: 10,
+  },
+  checkboxItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  checkboxText: {
+    fontSize: 16,
+    color: theme.colors.textSecondary,
+  },
+  selectedCheckboxText: {
+    color: theme.colors.textLight,
+  },
+  checkbox: {
+    width: 30,
+    height: 30,
+    marginRight: 10,
+  },
+  checkboxChecked: {
+    borderColor: theme.colors.primary,
+  },
+  checkboxLabel: {
+    fontSize: theme.typography.fontSize.base,
+    color: theme.colors.textSecondary,
   },
 });
 
