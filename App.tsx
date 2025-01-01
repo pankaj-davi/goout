@@ -39,7 +39,6 @@ const createIcon = (name: string) => {
   );
 };
 
-// Create Back Button
 const createBackButton = (navigation: any) => (
   <Icon
     name="arrow-back-outline"
@@ -50,15 +49,29 @@ const createBackButton = (navigation: any) => (
   />
 );
 
-// Screen Options for Stack Navigator
 const createScreenOptions = (navigation: any, showBackIcon: boolean): any => ({
   headerLeft: () => showBackIcon && createBackButton(navigation),
   headerTitleAlign: 'start',
 });
 
-/** Navigators **/
+const ChatHeader = ({ route }: { route: any }) => {
+  const { friendName = 'Unknown', friendImage = '' } = route.params as {
+    friendName?: string;
+    friendImage?: string;
+  };
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+      <Image
+        source={{ uri: friendImage }}
+        style={{ width: 40, height: 40, borderRadius: 20, marginRight: 10 }}
+      />
+      <Text style={{ fontSize: 18, fontWeight: '600', color: 'black' }}>
+        {friendName}
+      </Text>
+    </View>
+  );
+};
 
-// Stack Navigator
 const StackNavigator = () => (
   <Stack.Navigator>
     <Stack.Screen
@@ -71,40 +84,13 @@ const StackNavigator = () => (
       component={ChatScreen}
       options={({ navigation, route }) => ({
         headerShown: true,
-        headerTitle: () => {
-          const { friendName = 'Unknown', friendImage = '' } = route.params as {
-            friendName?: string;
-            friendImage?: string;
-          };
-          return (
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}
-            >
-              <Image
-                source={{ uri: friendImage }}
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 20,
-                  marginRight: 10,
-                }}
-              />
-              <Text style={{ fontSize: 18, fontWeight: '600', color: 'black' }}>
-                {friendName}
-              </Text>
-            </View>
-          );
-        },
+        headerTitle: () => <ChatHeader route={route} />,
         ...createScreenOptions(navigation, true),
       })}
     />
   </Stack.Navigator>
 );
 
-// Tab Navigator
 const TabNavigator = () => {
   const { isAuthenticated, user } = useAuth();
 
@@ -181,8 +167,6 @@ const TabNavigator = () => {
   );
 };
 
-/** Main App Components **/
-
 const MainApp = () => {
   const { isAuthLoading } = useAuth();
 
@@ -201,7 +185,6 @@ const MainApp = () => {
   );
 };
 
-// Permission Initialization
 const useInitializePermissions = () => {
   useEffect(() => {
     const initPermissions = async () => {
@@ -234,8 +217,6 @@ const useInitializePermissions = () => {
     initPermissions();
   }, []);
 };
-
-/** App Component **/
 
 const App = () => {
   useInitializePermissions();
