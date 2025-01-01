@@ -27,7 +27,7 @@ export interface UserOnboardDetails {
 
 const OnboardingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const { setUser, logout, user } = useAuth();
-  const [step, setStep] = useState<number>(6);
+  const [step, setStep] = useState<number>(1);
   const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
   const [date, setDate] = useState<Date>(new Date());
 
