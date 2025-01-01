@@ -13,7 +13,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 
 import { theme } from '../../theme/index';
 
-interface UserDetails {
+export interface UserDetails {
   name: string;
   dob: string;
   gender: string;
@@ -21,7 +21,7 @@ interface UserDetails {
   workLifeBalance: string;
 }
 
-const OnboardingScreen: React.FC = () => {
+const OnboardingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const {
     control,
     handleSubmit,

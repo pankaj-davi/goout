@@ -35,11 +35,8 @@ export interface IUser {
   uid: string;
   name: string | '';
   photo: string | '';
-  displayName: string | null;
   email: string | null;
   photoURL: string | null;
-  familyName?: string | null;
-  givenName?: string | null;
   deviceToken: string;
   isNewUser: boolean;
 }
@@ -129,11 +126,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           name: user.displayName || profile.given_name || null, // fallback to given_name if displayName is null
           email: user.email || profile.email || '', // use the profile email as a fallback
           photo: user.photoURL || profile.picture || null, // fallback to Google profile picture
-          familyName: profile.family_name || null, // optional
-          givenName: profile.given_name || null,
-          displayName: user.displayName || null,
           photoURL: user.photoURL || profile.picture || null,
-          isNewUser: true,
+          isNewUser: additionalUserInfo.isNewUser || false,
           deviceToken,
         };
 
