@@ -34,7 +34,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
 const styles = StyleSheet.create({
   container: {
     padding: 10,
-    marginVertical: 5,
+    marginVertical: 8,
     borderRadius: 8,
     maxWidth: '75%',
   },
@@ -49,11 +49,11 @@ const styles = StyleSheet.create({
   sender: {
     fontWeight: 'bold',
     color: colors.primary,
-    fontSize: typography.fontSize.base,
+    fontSize: typography.fontSize.sm,
   },
   message: {
-    marginVertical: 5,
     color: colors.text,
+    fontSize: typography.fontSize.xs,
   },
   timestamp: {
     fontSize: typography.fontSize.xs,

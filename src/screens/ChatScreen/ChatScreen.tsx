@@ -10,6 +10,7 @@ import firestore from '@react-native-firebase/firestore';
 import ChatMessage from './../../components/ChatMessage/ChatMessage';
 import { useAuth } from '../../../src/context/AuthContext';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { theme } from '../../theme/index';
 
 const ChatScreen: React.FC = ({ route }: any) => {
   const { user } = useAuth();
@@ -70,9 +71,12 @@ const ChatScreen: React.FC = ({ route }: any) => {
           value={newMessage}
           onChangeText={setNewMessage}
           placeholder="Type a message"
+          placeholderTextColor={theme.colors.text}
+          multiline={true}
+          returnKeyType="default"
         />
         <TouchableOpacity style={styles.iconContainer} onPress={sendMessage}>
-          <Icon name="send" size={30} color="#007AFF" />
+          <Icon name="send" size={25} color={theme.colors.primary} />
         </TouchableOpacity>
       </View>
     </View>
@@ -90,20 +94,21 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   input: {
-    flex: 1,
-    color: '#000',
-    borderColor: 'gray',
+    width: '100%',
+    minHeight: 50, // Minimum height
+    maxHeight: 150, // Optional: Limit the height
+    borderColor: theme.colors.border,
     borderWidth: 1,
-    borderRadius: 20,
+    borderRadius: 8,
     paddingHorizontal: 10,
-    paddingVertical: 8, // Adjust padding for icon positioning
-    marginRight: 10,
-    paddingRight: 40, // Space for the icon inside the input
+    color: theme.colors.text,
+    backgroundColor: '#fff',
+    textAlignVertical: 'top', // Align text to the top
   },
   iconContainer: {
     position: 'absolute',
-    right: 20, // Place icon inside the input on the right
-    top: '50%', // Vertically center the icon
+    right: 15, // Place icon inside the input on the right
+    top: '55%', // Vertically center the icon
     transform: [{ translateY: -15 }],
   },
 });

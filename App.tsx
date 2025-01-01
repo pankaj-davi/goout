@@ -3,7 +3,14 @@ import { ThemeProvider } from './src/components/ThemeProvider';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
-import { ActivityIndicator, View, StyleSheet, Alert } from 'react-native';
+import {
+  ActivityIndicator,
+  View,
+  StyleSheet,
+  Alert,
+  Text,
+  Image,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import LoginScreen from './src/screens/LoginScreen/LoginScreen';
@@ -62,9 +69,35 @@ const StackNavigator = () => (
     <Stack.Screen
       name="ChatScreen"
       component={ChatScreen}
-      options={({ navigation }) => ({
+      options={({ navigation, route }) => ({
         headerShown: true,
-        headerTitle: 'Chat',
+        headerTitle: () => {
+          const { friendName = 'Unknown', friendImage = '' } = route.params as {
+            friendName?: string;
+            friendImage?: string;
+          };
+          return (
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+              }}
+            >
+              <Image
+                source={{ uri: friendImage }}
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 20,
+                  marginRight: 10,
+                }}
+              />
+              <Text style={{ fontSize: 18, fontWeight: '600', color: 'black' }}>
+                {friendName}
+              </Text>
+            </View>
+          );
+        },
         ...createScreenOptions(navigation, true),
       })}
     />

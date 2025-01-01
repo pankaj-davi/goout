@@ -6,6 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useUserSubCollection } from '../../hooks/useUserSubCollection';
 
 import ListWrapper from '../../components/ListWrapper';
+import { theme } from '../../theme/index';
 
 const FriendsScreen: React.FC = () => {
   const { user } = useAuth();
@@ -13,15 +14,23 @@ const FriendsScreen: React.FC = () => {
   const navigation = useNavigation();
   const { error, data: friends, loading } = useUserSubCollection('friends');
   const currentUserId = user.uid;
-  const handleFriendPress = (friendUid: string, friendName: string) => {
+  const handleFriendPress = (
+    friendUid: string,
+    friendName: string,
+    friendImage: string
+  ) => {
     const chatId = [currentUserId, friendUid].sort().join('_');
     //@ts-ignore
-    navigation.navigate('ChatScreen', { chatId, friendName });
+    navigation.navigate('ChatScreen', {
+      chatId,
+      friendImage: friendImage,
+      friendName: friendName,
+    });
   };
 
   const renderItem = ({ item }: { item: IUser }) => (
     <TouchableOpacity
-      onPress={() => handleFriendPress(item.uid, item.name)}
+      onPress={() => handleFriendPress(item.uid, item.name, item.photo)}
       style={styles.friendItem}
     >
       <Image source={{ uri: item.photo }} style={styles.icon} />
@@ -45,23 +54,21 @@ export default FriendsScreen;
 
 const styles = StyleSheet.create({
   friendItem: {
-    paddingTop: 15,
-    paddingBottom: 15,
-    paddingRight: 10,
-    paddingLeft: 10,
+    paddingVertical: theme.spacing.md,
+    paddingHorizontal: theme.spacing.sm,
     flexDirection: 'row',
     alignItems: 'flex-start',
-    backgroundColor: '#fff',
+    backgroundColor: theme.colors.background,
     borderBottomWidth: 1,
-    borderBottomColor: '#CECBCB',
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
+    borderBottomColor: theme.colors.border,
+    marginBottom: theme.spacing.sm,
+    ...theme.shadows.md,
   },
   icon: {
-    width: 55,
-    height: 55,
+    width: 50,
+    height: 50,
     borderRadius: 50,
-    marginRight: 10,
+    marginRight: theme.spacing.sm,
   },
   friendDetails: {
     flex: 1,
@@ -70,8 +77,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   name: {
-    fontSize: 18,
-    color: '#000',
+    fontSize: theme.typography.fontSize.lg,
+    color: theme.colors.text,
   },
   buttonContainer: {
     flexDirection: 'row',

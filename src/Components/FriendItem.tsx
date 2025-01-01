@@ -59,7 +59,7 @@ export default FriendItem;
 
 const styles = StyleSheet.create({
   friendItem: {
-    padding: 15,
+    padding: 10,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#fff',

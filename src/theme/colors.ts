@@ -53,7 +53,7 @@ export const colors = {
   // UI Elements
   border: '#E5E5E5', // Subtle gray for borders
   divider: '#EEEEEE', // Light gray divider lines
-  shadow: 'rgba(0, 0, 0, 0.1)', // Soft shadow for depth
+  shadow: 'rgba(0, 0, 0, 0.3)', // Soft shadow for depth
   overlay: 'rgba(0, 0, 0, 0.5)', // Semi-transparent overlay for modals or popups
 
   // Interactive states

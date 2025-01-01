@@ -56,4 +56,4 @@ export const theme = {
       elevation: 8,
     },
   },
-}
+};
