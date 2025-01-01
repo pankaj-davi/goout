@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -12,8 +12,10 @@ import { useForm, Controller } from 'react-hook-form';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 import { theme } from '../../theme/index';
+import { IUser, useAuth } from '../../context/AuthContext';
+import { updateUserProfileToFirestore } from '../../services/firebase/firebase';
 
-export interface UserDetails {
+export interface UserOnboardDetails {
   name: string;
   dob: string;
   gender: string;
@@ -22,6 +24,11 @@ export interface UserDetails {
 }
 
 const OnboardingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+  const { setUser, logout, user } = useAuth();
+  const [step, setStep] = useState<number>(1);
+  const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
+  const [date, setDate] = useState<Date>(new Date());
+
   const {
     control,
     handleSubmit,
@@ -30,7 +37,7 @@ const OnboardingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     formState: { errors },
     trigger,
     setFocus,
-  } = useForm<UserDetails>({
+  } = useForm<UserOnboardDetails>({
     defaultValues: {
       name: '',
       dob: '',
@@ -41,15 +48,18 @@ const OnboardingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     mode: 'onTouched',
     shouldFocusError: true,
   });
-
-  const [step, setStep] = useState<number>(1);
-  const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
-  const [date, setDate] = useState<Date>(new Date());
   const nameInputRef = useRef<TextInput | null>(null);
 
-  const onSubmit = (data: UserDetails) => {
-    console.log('User Details:', data);
-    Alert.alert('Form Submitted', JSON.stringify(data, null, 2));
+  // apply use callback on this onSubmit function based in the user
+
+  const onSubmit = async (userOnboardDetails: UserOnboardDetails) => {
+    try {
+      await updateUserProfileToFirestore(userOnboardDetails);
+
+      await navigation.navigate('MainTabs');
+    } catch (error) {
+      Alert.alert('Error', 'An error occurred. Please try again.');
+    }
   };
 
   const onDateChange = (event: any, selectedDate: Date | undefined) => {

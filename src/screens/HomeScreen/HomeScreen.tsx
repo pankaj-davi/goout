@@ -161,7 +161,7 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           if (modalVisible) resetModal(); // Close modal if the map is pressed
         }}
       >
-        {currentLocation && (
+        {/* {currentLocation && (
           <Marker coordinate={currentLocation}>
             <View style={[styles.markerContainer, styles.currentUserMarker]}>
               <View style={styles.markerPin}>
@@ -172,7 +172,7 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
               </View>
             </View>
           </Marker>
-        )}
+        )} */}
 
         {allUsers.map((otherUser) => {
           const { location, photo, uid } = otherUser;
@@ -216,31 +216,3 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 };
 
 export default HomeScreen;
-// Function to calculate the distance between two geographic points
-// const calculateDistance = (
-//   point1: GeoPoint | null,
-//   point2: GeoPoint | null,
-// ): number => {
-//   if (!point1 || !point2) {
-//     return Infinity; // Return a large number if either point is null
-//   }
-
-//   const toRad = (value: number): number => (value * Math.PI) / 180; // Convert degrees to radians
-//   const R = 6371e3; // Radius of Earth in meters
-
-//   const lat1 = toRad(point1.latitude);
-//   const lat2 = toRad(point2.latitude);
-//   const deltaLat = toRad(point2.latitude - point1.latitude);
-//   const deltaLon = toRad(point2.longitude - point1.longitude);
-
-//   const a =
-//     Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
-//     Math.cos(lat1) *
-//       Math.cos(lat2) *
-//       Math.sin(deltaLon / 2) *
-//       Math.sin(deltaLon / 2);
-
-//   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-//   return R * c; // Distance in meters
-// };

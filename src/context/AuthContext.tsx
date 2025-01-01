@@ -1,4 +1,3 @@
-// import { FIRE_BASE_CLIENT_ID } from 'react-native-dotenv';
 import React, {
   createContext,
   useState,
@@ -29,6 +28,7 @@ interface AuthContextProps {
   login: () => void;
   logout: () => void;
   user: IUser;
+  setUser: React.Dispatch<React.SetStateAction<IUser | null>>;
 }
 
 export interface IUser {
@@ -39,6 +39,7 @@ export interface IUser {
   photoURL: string | null;
   deviceToken: string;
   isNewUser: boolean;
+  isOnBoarded: boolean;
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -73,6 +74,20 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (user?.uid) {
+      const unsubscribe = firestore()
+        .collection('users')
+        .doc(user.uid)
+        .onSnapshot((doc) => {
+          if (doc.exists) {
+            setUser((prev) => (prev ? { ...prev, ...doc.data() } : null));
+          }
+        });
+      return () => unsubscribe();
+    }
+  }, [user?.uid]);
 
   GoogleSignin.configure({
     webClientId: FIRE_BASE_CLIENT_ID,
@@ -128,6 +143,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           photo: user.photoURL || profile.picture || null, // fallback to Google profile picture
           photoURL: user.photoURL || profile.picture || null,
           isNewUser: additionalUserInfo.isNewUser || false,
+          isOnBoarded: false,
           deviceToken,
         };
 
@@ -135,9 +151,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         setIsAuthenticated(true);
         setUser(userInfoToStore);
 
+        // if user isnwew, save the user data to Firestore
+        if (additionalUserInfo.isNewUser) {
+          await saveUserDataToFirestore(userInfoToStore);
+        }
+
         // Save the user data to AsyncStorage and Firestore
         await saveUserDataToStorage(userInfoToStore);
-        await saveUserDataToFirestore(userInfoToStore);
       }
 
       console.log('User signed in successfully');
@@ -166,7 +186,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, isAuthLoading, login, logout, user }}
+      value={{ isAuthenticated, isAuthLoading, login, logout, user, setUser }}
     >
       {children}
     </AuthContext.Provider>
