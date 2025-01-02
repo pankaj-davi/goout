@@ -94,6 +94,14 @@ const StackNavigator = () => (
 const TabNavigator = () => {
   const { isAuthenticated, user, isAuthLoading } = useAuth();
 
+  if (isAuthLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
+
   if (!isAuthenticated) {
     return (
       <Tab.Navigator>
@@ -110,7 +118,7 @@ const TabNavigator = () => {
     );
   }
 
-  if (!isAuthLoading && isAuthenticated && user && !user.isOnBoarded) {
+  if (isAuthenticated && user && !user.isOnBoarded) {
     return (
       <Stack.Navigator>
         <Stack.Screen
