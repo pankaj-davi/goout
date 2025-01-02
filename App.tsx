@@ -92,7 +92,7 @@ const StackNavigator = () => (
 );
 
 const TabNavigator = () => {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, isAuthLoading } = useAuth();
 
   if (!isAuthenticated) {
     return (
@@ -110,7 +110,7 @@ const TabNavigator = () => {
     );
   }
 
-  if (isAuthenticated && user && !user.isOnBoarded) {
+  if (!isAuthLoading && isAuthenticated && user && !user.isOnBoarded) {
     return (
       <Stack.Navigator>
         <Stack.Screen

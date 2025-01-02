@@ -6,6 +6,7 @@ import { typography } from '../../theme/typography';
 import LogoIcon from '../../assets/logo-icon.svg'; // Import your SVG
 import { useAuth } from '../../context/AuthContext';
 import { GoogleSigninButton } from '@react-native-google-signin/google-signin';
+import EmailLoginScreen from './EmailLoginScreen';
 
 const LoginScreen: React.FC = () => {
   const { login } = useAuth();
@@ -17,6 +18,8 @@ const LoginScreen: React.FC = () => {
         <LogoIcon />
         <Text style={styles.textPart}>{'OUT'}</Text>
       </View>
+
+      <EmailLoginScreen />
 
       {/* Sign-in button */}
       <GoogleSigninButton

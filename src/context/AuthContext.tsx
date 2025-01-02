@@ -29,6 +29,8 @@ interface AuthContextProps {
   logout: () => void;
   user: IUser;
   setUser: React.Dispatch<React.SetStateAction<IUser | null>>;
+  loginWithEmail: (email: string, password: string) => void;
+  registerWithEmail: (email: string, password: string) => void;
 }
 
 export interface IUser {
@@ -184,9 +186,86 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
+  const loginWithEmail = async (email: string, password: string) => {
+    setIsAuthLoading(true);
+    try {
+      const userCredential = await auth().signInWithEmailAndPassword(
+        email,
+        password
+      );
+      const user = userCredential.user;
+
+      if (user.emailVerified) {
+        const deviceToken = await messaging().getToken();
+        const userInfoToStore: IUser = {
+          uid: user.uid,
+          name: user.displayName || '',
+          email: user.email,
+          photo: user.photoURL || '',
+          photoURL: user.photoURL || '',
+          isNewUser: false,
+          isOnBoarded: false,
+          deviceToken,
+        };
+
+        setIsAuthenticated(true);
+        setUser(userInfoToStore);
+
+        await saveUserDataToFirestore(userInfoToStore);
+        await saveUserDataToStorage(userInfoToStore);
+      } else {
+        throw new Error('Email not verified. Please check your inbox.');
+      }
+    } catch (error) {
+      console.error('Error logging in with email:', error);
+    } finally {
+      setIsAuthLoading(false);
+    }
+  };
+
+  const registerWithEmail = async (email: string, password: string) => {
+    setIsAuthLoading(true);
+    try {
+      const userCredential = await auth().createUserWithEmailAndPassword(
+        email,
+        password
+      );
+      const user = userCredential.user;
+
+      await user.sendEmailVerification();
+      console.log('Verification email sent! Please check your inbox.');
+
+      const userInfoToStore: IUser = {
+        uid: user.uid,
+        name: user.displayName || '',
+        email: user.email,
+        photo: user.photoURL || '',
+        photoURL: user.photoURL || '',
+        isNewUser: true,
+        isOnBoarded: false,
+        deviceToken: '',
+      };
+
+      await saveUserDataToFirestore(userInfoToStore);
+    } catch (error) {
+      console.error('Error registering with email:', error);
+    } finally {
+      setIsAuthLoading(false);
+    }
+  };
+
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, isAuthLoading, login, logout, user, setUser }}
+      value={{
+        isAuthenticated,
+        isAuthLoading,
+        login,
+        logout,
+        user,
+        setUser,
+        registerWithEmail,
+        loginWithEmail,
+      }}
     >
       {children}
     </AuthContext.Provider>
