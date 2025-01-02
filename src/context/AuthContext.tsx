@@ -213,6 +213,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
         await saveUserDataToFirestore(userInfoToStore);
         await saveUserDataToStorage(userInfoToStore);
+      } else if (!user.emailVerified) {
+        await user.sendEmailVerification();
+        console.log('Verification email sent! Please check your inbox.');
       } else {
         throw new Error('Email not verified. Please check your inbox.');
       }
