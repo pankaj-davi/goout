@@ -145,35 +145,44 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       const userCredential =
         await auth().signInWithCredential(googleCredential);
 
-      // Extract necessary details from the userCredential object
       const { additionalUserInfo, user } = userCredential;
       if (additionalUserInfo && additionalUserInfo.profile) {
         const { profile } = additionalUserInfo;
 
         const deviceToken = await messaging().getToken();
 
-        // Mapping to the IUser interface for easy usage later
         const userInfoToStore: IUser = {
           uid: user.uid,
-          name: user.displayName || profile.given_name || null, // fallback to given_name if displayName is null
-          email: user.email || profile.email || '', // use the profile email as a fallback
-          photo: user.photoURL || profile.picture || null, // fallback to Google profile picture
-          photoURL: user.photoURL || profile.picture || null,
+          name: user.displayName || profile.given_name || '',
+          email: user.email || profile.email || '',
+          photo: user.photoURL || profile.picture || '',
+          photoURL: user.photoURL || profile.picture || '',
           isNewUser: additionalUserInfo.isNewUser || false,
           isOnBoarded: false,
           deviceToken,
         };
 
-        // Set user and authentication state
         setIsAuthenticated(true);
         setUser(userInfoToStore);
 
-        // if user isnwew, save the user data to Firestore
-        if (additionalUserInfo.isNewUser) {
-          await saveUserDataToFirestore(userInfoToStore);
+        const userDocRef = firestore().collection('users').doc(user.uid);
+        const doc = await userDocRef.get();
+
+        if (!doc.exists) {
+          await userDocRef.set(userInfoToStore);
+        } else {
+          const existingData = doc.data() || {};
+          const updatedData = { ...existingData };
+
+          Object.keys(userInfoToStore).forEach((key) => {
+            if (userInfoToStore[key as keyof IUser]) {
+              updatedData[key] = userInfoToStore[key as keyof IUser];
+            }
+          });
+
+          await userDocRef.update(updatedData);
         }
 
-        // Save the user data to AsyncStorage and Firestore
         await saveUserDataToStorage(userInfoToStore);
       }
 
