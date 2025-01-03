@@ -149,12 +149,16 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         provider={PROVIDER_GOOGLE}
         style={styles.map}
         // liteMode={true}
-        region={{
-          latitude: currentLocation?.latitude || 37.78825,
-          longitude: currentLocation?.longitude || -122.4324,
-          latitudeDelta: 0.015,
-          longitudeDelta: 0.0121,
-        }}
+        region={
+          currentLocation
+            ? {
+                latitude: currentLocation.latitude,
+                longitude: currentLocation.longitude,
+                latitudeDelta: 0.015,
+                longitudeDelta: 0.0121,
+              }
+            : undefined
+        }
         showsUserLocation={false} // Control visibility of user location button
         showsMyLocationButton={false}
         onPress={() => {
