@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Button, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
 import { useForm, Controller } from 'react-hook-form';
 import { TextInput } from 'react-native-gesture-handler';
@@ -23,12 +23,20 @@ const EmailLoginScreen: React.FC = () => {
     shouldFocusError: true, // Automatically focus on the first invalid field
   });
 
-  const onSubmit = (data: FormData) => {
+  const onSubmit = async (data: FormData) => {
     const { email, password } = data;
-    if (isRegistering) {
-      registerWithEmail(email, password);
-    } else {
-      loginWithEmail(email, password);
+    try {
+      if (isRegistering) {
+        await registerWithEmail(email, password);
+      } else {
+        await loginWithEmail(email, password);
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        Alert.alert('Error', error.message);
+      } else {
+        Alert.alert('Error', 'An unknown error occurred.');
+      }
     }
   };
 

@@ -27,7 +27,7 @@ interface AuthContextProps {
   isAuthLoading: boolean;
   login: () => void;
   logout: () => void;
-  user: IUser;
+  user: IUser | null;
   setUser: React.Dispatch<React.SetStateAction<IUser | null>>;
   loginWithEmail: (email: string, password: string) => void;
   registerWithEmail: (email: string, password: string) => void;
@@ -103,7 +103,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         .set(userData, { merge: true });
       console.log('User data saved to Firestore successfully');
     } catch (err) {
-      console.error('Error saving user data to Firestore:', err);
+      throw err;
     }
   };
 
@@ -164,8 +164,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
       console.log('User signed in successfully');
     } catch (err: unknown) {
-      console.log(err, 'User signed in errerrerr');
-      // handleError(err); // Reuse the error handler from earlier code
+      throw err;
     } finally {
       setIsAuthLoading(false);
     }
@@ -183,6 +182,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         'Logout Error:',
         error instanceof Error ? error.message : error
       );
+      throw error; // Throw the error after logging it
     }
   };
 
@@ -213,14 +213,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
         await saveUserDataToFirestore(userInfoToStore);
         await saveUserDataToStorage(userInfoToStore);
-      } else if (!user.emailVerified) {
+      } else {
         await user.sendEmailVerification();
         console.log('Verification email sent! Please check your inbox.');
-      } else {
         throw new Error('Email not verified. Please check your inbox.');
       }
     } catch (error) {
-      console.error('Error logging in with email:', error);
+      throw error;
     } finally {
       setIsAuthLoading(false);
     }
@@ -250,8 +249,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       };
 
       await saveUserDataToFirestore(userInfoToStore);
+
+      await logout();
+
+      // Throw an error to be caught by the calling component
+      throw new Error('Verification email sent! Please check your inbox.');
     } catch (error) {
-      console.error('Error registering with email:', error);
+      throw error;
     } finally {
       setIsAuthLoading(false);
     }
