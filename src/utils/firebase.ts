@@ -276,30 +276,21 @@ export const getCurrentPosition = () => {
 };
 
 // Function to save or update user location
+
 export const saveUserLocation = async (
-  user: IUser,
+  userUid: string,
   latitude: number,
   longitude: number
 ) => {
-  if (user) {
-    try {
-      const userDocRef = firestore().collection('users').doc(user.uid);
-      const doc = await userDocRef.get();
-      if (!doc.exists) {
-        await userDocRef.set({
-          ...user,
-          location: { latitude, longitude },
-        });
-        console.log('User details saved successfully', user);
-      } else {
-        await userDocRef.update({
-          location: { latitude, longitude },
-        });
-        console.log('User location updated successfully');
-      }
-    } catch (error) {
-      throw new Error(`Error saving user location: ${(error as any).message}`);
-    }
+  try {
+    const userDocRef = firestore().collection('users').doc(userUid);
+    await userDocRef.update({
+      location: { latitude, longitude },
+    });
+    console.log('User location updated successfully');
+  } catch (error) {
+    console.error('Error updating user location:', error);
+    throw new Error(`Error updating user location: ${(error as any).message}`);
   }
 };
 

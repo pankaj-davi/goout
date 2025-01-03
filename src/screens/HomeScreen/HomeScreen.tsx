@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Alert, Image, Button } from 'react-native';
+import { StyleSheet, View, Alert, Image, Text } from 'react-native';
 import { colors } from '../../theme/colors';
 import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 import { IUser, useAuth } from '../../context/AuthContext';
 import UserInfoModal from '../../components/Modal/UserInfoModal'; // Adjust the path as necessary
-import DrawerButton from '../../components/DrawerButton/DrawerButton';
+// import DrawerButton from '../../components/DrawerButton/DrawerButton';
 import {
   fetchAllUsersWithLocation,
   getCurrentPosition,
@@ -56,6 +56,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.5,
     shadowRadius: 2,
   },
+  markerText: {
+    color: colors.textLight,
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
   currentUserMarker: {
     borderColor: colors.primaryLight,
   },
@@ -81,13 +86,13 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
   const fetchData = async () => {
     try {
-      const users = await fetchAllUsersWithLocation(); // Fetch users on mount
-      setAllUsers(users);
       const position: any = await getCurrentPosition(); // Get the initial position
       setCurrentLocation(position);
-      if (user) {
-        await saveUserLocation(user, position.latitude, position.longitude); // Save user location in DB
+      if (user && user.uid) {
+        await saveUserLocation(user.uid, position.latitude, position.longitude); // Save user location in DB
       }
+      const users = await fetchAllUsersWithLocation(); // Fetch users after setting location
+      setAllUsers(users);
     } catch (error) {
       Alert.alert(
         'Error',
@@ -118,14 +123,14 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             latitudeDelta: 0.015,
             longitudeDelta: 0.0121,
           }}
-          showsUserLocation={false} // Control visibility of user location button
+          showsUserLocation={false}
           showsMyLocationButton={false}
           onPress={() => {
-            if (modalVisible) resetModal(); // Close modal if the map is pressed
+            if (modalVisible) resetModal();
           }}
         >
           {allUsers.map((otherUser) => {
-            const { location, photo, uid } = otherUser;
+            const { location, photo, uid, name } = otherUser;
             if (location && location.latitude && location.longitude) {
               return (
                 <Marker
@@ -144,10 +149,18 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                     style={[styles.markerContainer, styles.otherUserMarker]}
                   >
                     <View style={styles.markerPin}>
-                      <Image
-                        source={{ uri: photo }}
-                        style={styles.markerImage}
-                      />
+                      {photo ? (
+                        <Image
+                          source={{ uri: photo }}
+                          style={styles.markerImage}
+                        />
+                      ) : (
+                        <View style={styles.markerImage}>
+                          <Text style={styles.markerText}>
+                            {name.charAt(0).toUpperCase()}
+                          </Text>
+                        </View>
+                      )}
                     </View>
                   </View>
                 </Marker>
