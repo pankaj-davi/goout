@@ -40,6 +40,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 16,
+    width: '100%',
   },
   headerContainer: {
     flexDirection: 'row', // Aligns elements horizontally (text + SVG)
@@ -54,7 +55,8 @@ const styles = StyleSheet.create({
     margin: -22, // No margins for text to avoid extra space
   },
   googleButton: {
-    height: 60, // Adjust height as necessary
-    marginTop: 20, // Space above the button
+    width: '100%',
+    height: 60,
+    marginTop: 20,
   },
 });

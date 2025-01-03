@@ -161,19 +161,6 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           if (modalVisible) resetModal(); // Close modal if the map is pressed
         }}
       >
-        {/* {currentLocation && (
-          <Marker coordinate={currentLocation}>
-            <View style={[styles.markerContainer, styles.currentUserMarker]}>
-              <View style={styles.markerPin}>
-                <Image
-                  source={{ uri: user!.photo! }}
-                  style={styles.markerImage}
-                />
-              </View>
-            </View>
-          </Marker>
-        )} */}
-
         {allUsers.map((otherUser) => {
           const { location, photo, uid } = otherUser;
           if (location && location.latitude && location.longitude) {
@@ -185,7 +172,7 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                   longitude: location.longitude,
                 }}
                 onPress={(e) => {
-                  e.stopPropagation(); // Prevents the map from reacting
+                  e.stopPropagation();
                   setSelectedFriendUser(otherUser);
                   setModalVisible(true);
                 }}
@@ -203,7 +190,7 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       </MapView>
 
       {/* User Info Modal */}
-      {selectedFriendUser && (
+      {selectedFriendUser && user && (
         <UserInfoModal
           visible={modalVisible}
           currentUser={user}
