@@ -9,7 +9,7 @@ import { GoogleSigninButton } from '@react-native-google-signin/google-signin';
 import EmailLoginScreen from './EmailLoginScreen';
 
 const LoginScreen: React.FC = () => {
-  const { login } = useAuth();
+  const { GoogleSigninLogin } = useAuth();
 
   return (
     <View style={styles.container}>
@@ -26,7 +26,7 @@ const LoginScreen: React.FC = () => {
         style={styles.googleButton}
         size={GoogleSigninButton.Size.Wide}
         color={GoogleSigninButton.Color.Dark}
-        onPress={() => login()}
+        onPress={() => GoogleSigninLogin()}
       />
     </View>
   );

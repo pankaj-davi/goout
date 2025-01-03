@@ -11,7 +11,8 @@ interface FormData {
 }
 
 const EmailLoginScreen: React.FC = () => {
-  const { loginWithEmail, registerWithEmail } = useAuth();
+  const { signInWithEmailAndPassword, createUserWithEmailAndPassword } =
+    useAuth();
   const [isRegistering, setIsRegistering] = useState(false);
 
   const {
@@ -27,9 +28,9 @@ const EmailLoginScreen: React.FC = () => {
     const { email, password } = data;
     try {
       if (isRegistering) {
-        await registerWithEmail(email, password);
+        await createUserWithEmailAndPassword(email, password);
       } else {
-        await loginWithEmail(email, password);
+        await signInWithEmailAndPassword(email, password);
       }
     } catch (error) {
       if (error instanceof Error) {

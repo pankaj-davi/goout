@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import firestore from '@react-native-firebase/firestore';
+import Geolocation from '@react-native-community/geolocation';
 import { IUser } from '../../src/context/AuthContext';
 import { sendCustomPushNotification } from './pushNotificationService';
 import { useAuth } from '../context/AuthContext'; // Importing useAuth to get user context
@@ -84,7 +85,7 @@ export const fetchUserSubCollection = (
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    if (!user.uid) {
+    if (!user || !user.uid) {
       setData([]); // Reset data if no user.uid
       setLoading(false);
       return;
@@ -112,7 +113,7 @@ export const fetchUserSubCollection = (
 
     // Clean up the listener on component unmount
     return () => unsubscribe();
-  }, [user.uid, subcollection]); // Add subcollection as a dependency
+  }, [user?.uid, subcollection]); // Add subcollection as a dependency
 
   // Memoize the data list to prevent unnecessary re-renders
   const memoizedData = useMemo(() => data, [data]);
@@ -238,5 +239,65 @@ export const WithdrawFriendRequest = async (
     await removeFirestoreDoc(friendData.uid, 'connections', currentUser.uid);
   } catch (error) {
     console.error('Error withdrawing friend request: ', error);
+  }
+};
+
+// Function to fetch all users with location
+export const fetchAllUsersWithLocation = async () => {
+  try {
+    const usersSnapshot = await firestore().collection('users').get();
+    const usersWithLocation = usersSnapshot.docs.map((doc) => doc.data());
+    return usersWithLocation;
+  } catch (error: any) {
+    throw new Error(`Error fetching users with location: ${error.message}`);
+  }
+};
+
+// Function to get current position
+export const getCurrentPosition = () => {
+  return new Promise((resolve, reject) => {
+    Geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        resolve({ latitude, longitude });
+      },
+      (error) => {
+        console.error(error);
+        reject(
+          new Error('Unable to get current location. Please try again later.')
+        );
+      },
+      {
+        enableHighAccuracy: true, // Ensure high accuracy for better location
+      }
+    );
+  });
+};
+
+// Function to save or update user location
+export const saveUserLocation = async (
+  user: IUser,
+  latitude: number,
+  longitude: number
+) => {
+  if (user) {
+    try {
+      const userDocRef = firestore().collection('users').doc(user.uid);
+      const doc = await userDocRef.get();
+      if (!doc.exists) {
+        await userDocRef.set({
+          ...user,
+          location: { latitude, longitude },
+        });
+        console.log('User details saved successfully', user);
+      } else {
+        await userDocRef.update({
+          location: { latitude, longitude },
+        });
+        console.log('User location updated successfully');
+      }
+    } catch (error) {
+      throw new Error(`Error saving user location: ${(error as any).message}`);
+    }
   }
 };

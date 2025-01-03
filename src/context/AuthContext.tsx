@@ -25,12 +25,12 @@ interface GoogleUserInfo {
 interface AuthContextProps {
   isAuthenticated: boolean;
   isAuthLoading: boolean;
-  login: () => void;
+  GoogleSigninLogin: () => void;
   logout: () => void;
   user: IUser | null;
   setUser: React.Dispatch<React.SetStateAction<IUser | null>>;
-  loginWithEmail: (email: string, password: string) => void;
-  registerWithEmail: (email: string, password: string) => void;
+  signInWithEmailAndPassword: (email: string, password: string) => void;
+  createUserWithEmailAndPassword: (email: string, password: string) => void;
 }
 
 export interface IUser {
@@ -42,6 +42,7 @@ export interface IUser {
   deviceToken: string;
   isNewUser: boolean;
   isOnBoarded: boolean;
+  phoneNumber?: string;
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -97,12 +98,26 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   const saveUserDataToFirestore = async (userData: IUser) => {
     try {
-      await firestore()
-        .collection('users')
-        .doc(userData.uid)
-        .set(userData, { merge: true });
+      console.log('Starting to save user data to Firestore...');
+      const userDocRef = firestore().collection('users').doc(userData.uid);
+      console.log('User document reference obtained:', userDocRef.id);
+      const doc = await userDocRef.get();
+      console.log(
+        'User document fetched:',
+        doc.exists ? 'exists' : 'does not exist'
+      );
+      if (!doc.exists) {
+        console.log('User document does not exist. Creating new document...');
+        await userDocRef.set(userData);
+        console.log('User document created successfully');
+      } else {
+        console.log('User document exists. Updating document...');
+        await userDocRef.update(userData);
+        console.log('User document updated successfully');
+      }
       console.log('User data saved to Firestore successfully');
     } catch (err) {
+      console.error('Error saving user data to Firestore:', err);
       throw err;
     }
   };
@@ -115,7 +130,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-  const login = async () => {
+  const GoogleSigninLogin = async () => {
     setIsAuthLoading(true);
     try {
       await GoogleSignin.hasPlayServices({
@@ -186,7 +201,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-  const loginWithEmail = async (email: string, password: string) => {
+  const signInWithEmailAndPassword = async (
+    email: string,
+    password: string
+  ) => {
     setIsAuthLoading(true);
     try {
       const userCredential = await auth().signInWithEmailAndPassword(
@@ -194,28 +212,32 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         password
       );
       const user = userCredential.user;
-
       if (user.emailVerified) {
-        const deviceToken = await messaging().getToken();
+        // get that user from firestore by uid
+        const userDoc = await firestore()
+          .collection('users')
+          .doc(user.uid)
+          .get();
+        const userData = userDoc.data() as IUser;
         const userInfoToStore: IUser = {
           uid: user.uid,
-          name: user.displayName || '',
+          name: user.displayName || userData.name,
           email: user.email,
-          photo: user.photoURL || '',
-          photoURL: user.photoURL || '',
-          isNewUser: false,
-          isOnBoarded: false,
-          deviceToken,
+          photo: user.photoURL || userData.photo,
+          photoURL: user.photoURL || userData.photo,
+          isNewUser: userData.isNewUser,
+          isOnBoarded: userData.isOnBoarded,
+          phoneNumber: user.phoneNumber || userData.phoneNumber,
+          deviceToken: userData.deviceToken,
         };
 
         setIsAuthenticated(true);
         setUser(userInfoToStore);
 
-        await saveUserDataToFirestore(userInfoToStore);
+        // await saveUserDataToFirestore(userInfoToStore);
         await saveUserDataToStorage(userInfoToStore);
       } else {
         await user.sendEmailVerification();
-        console.log('Verification email sent! Please check your inbox.');
         throw new Error('Email not verified. Please check your inbox.');
       }
     } catch (error) {
@@ -225,13 +247,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-  const registerWithEmail = async (email: string, password: string) => {
+  const createUserWithEmailAndPassword = async (
+    email: string,
+    password: string
+  ) => {
     setIsAuthLoading(true);
     try {
       const userCredential = await auth().createUserWithEmailAndPassword(
         email,
         password
       );
+      const deviceToken = await messaging().getToken();
       const user = userCredential.user;
 
       await user.sendEmailVerification();
@@ -245,7 +271,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         photoURL: user.photoURL || '',
         isNewUser: true,
         isOnBoarded: false,
-        deviceToken: '',
+        phoneNumber: user.phoneNumber || '',
+        deviceToken: deviceToken || '',
       };
 
       await saveUserDataToFirestore(userInfoToStore);
@@ -266,12 +293,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       value={{
         isAuthenticated,
         isAuthLoading,
-        login,
+        GoogleSigninLogin,
         logout,
         user,
         setUser,
-        registerWithEmail,
-        loginWithEmail,
+        createUserWithEmailAndPassword,
+        signInWithEmailAndPassword,
       }}
     >
       {children}
