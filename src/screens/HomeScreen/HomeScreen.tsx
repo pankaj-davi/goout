@@ -72,14 +72,30 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   );
 
   useEffect(() => {
-    fetchAllUsersWithLocation(); // Fetch users on mount
-    getCurrentPosition(); // Get the initial position
+    const fetchData = async () => {
+      try {
+        await fetchAllUsersWithLocation(); // Fetch users on mount
+        await getCurrentPosition(); // Get the initial position
+      } catch (error) {
+        Alert.alert(
+          'Error',
+          `Failed to fetch data. Please try again. ${JSON.stringify(error)}`
+        );
+      }
+    };
+
+    fetchData();
   }, []);
 
   // Function to update user's current location
   const updateLocation = (latitude: number, longitude: number) => {
     setCurrentLocation({ latitude, longitude });
-    saveUserLocation(latitude, longitude);
+    saveUserLocation(latitude, longitude).catch((error) => {
+      Alert.alert(
+        'Error',
+        `Failed to save location. Please try again. ${JSON.stringify(error)}`
+      );
+    });
   };
 
   // Function to get current position
@@ -108,8 +124,8 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       const usersSnapshot = await firestore().collection('users').get();
       const usersWithLocation = usersSnapshot.docs.map((doc) => doc.data());
       setAllUsers(usersWithLocation);
-    } catch (error) {
-      console.error('Error fetching users with location:', error);
+    } catch (error: any) {
+      throw new Error(`Error fetching users with location: ${error.message}`);
     }
   };
 
@@ -132,7 +148,9 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           console.log('User location updated successfully');
         }
       } catch (error) {
-        console.error('Error saving user location:', error);
+        throw new Error(
+          `Error saving user location: ${(error as any).message}`
+        );
       }
     }
   };
