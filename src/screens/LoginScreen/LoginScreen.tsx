@@ -43,16 +43,16 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   headerContainer: {
-    flexDirection: 'row', // Aligns elements horizontally (text + SVG)
-    alignItems: 'flex-end', // Align the text to the bottom of the SVG
-    marginBottom: 40, // Space between the header and button
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    marginBottom: 40,
   },
   textPart: {
-    fontSize: typography.fontSize['4xl'], // Font size for the text
-    fontWeight: 'bold', // Bold to match the SVG logo
+    fontSize: typography.fontSize['4xl'],
+    fontWeight: 'bold',
     color: colors.text,
-    shadowOpacity: 0.6, // Shadow opacity
-    margin: -22, // No margins for text to avoid extra space
+    shadowOpacity: 0.6,
+    margin: -22,
   },
   googleButton: {
     width: '100%',

@@ -13,7 +13,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 
 import { theme } from '../../theme/index';
 import { IUser, useAuth } from '../../context/AuthContext';
-import { updateUserProfileToFirestore } from '../../services/firebase/firebase';
+import { updateUserProfileToFirestore } from '../../utils/firebase';
 import CheckBox from '@react-native-community/checkbox';
 
 export interface UserOnboardDetails {
