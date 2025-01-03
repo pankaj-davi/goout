@@ -145,53 +145,56 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   return (
     <View style={styles.container}>
       {/* <DrawerButton navigation={navigation} userPhoto={user.photo || ''} /> */}
-      <MapView
-        provider={PROVIDER_GOOGLE}
-        style={styles.map}
-        // liteMode={true}
-        region={
-          currentLocation
-            ? {
-                latitude: currentLocation.latitude,
-                longitude: currentLocation.longitude,
-                latitudeDelta: 0.015,
-                longitudeDelta: 0.0121,
-              }
-            : undefined
-        }
-        showsUserLocation={false} // Control visibility of user location button
-        showsMyLocationButton={false}
-        onPress={() => {
-          if (modalVisible) resetModal(); // Close modal if the map is pressed
-        }}
-      >
-        {allUsers.map((otherUser) => {
-          const { location, photo, uid } = otherUser;
-          if (location && location.latitude && location.longitude) {
-            return (
-              <Marker
-                key={uid}
-                coordinate={{
-                  latitude: location.latitude,
-                  longitude: location.longitude,
-                }}
-                onPress={(e) => {
-                  e.stopPropagation();
-                  setSelectedFriendUser(otherUser);
-                  setModalVisible(true);
-                }}
-              >
-                <View style={[styles.markerContainer, styles.otherUserMarker]}>
-                  <View style={styles.markerPin}>
-                    <Image source={{ uri: photo }} style={styles.markerImage} />
+      {currentLocation && (
+        <MapView
+          provider={PROVIDER_GOOGLE}
+          style={styles.map}
+          // liteMode={true}
+          region={{
+            latitude: currentLocation.latitude,
+            longitude: currentLocation.longitude,
+            latitudeDelta: 0.015,
+            longitudeDelta: 0.0121,
+          }}
+          showsUserLocation={false} // Control visibility of user location button
+          showsMyLocationButton={false}
+          onPress={() => {
+            if (modalVisible) resetModal(); // Close modal if the map is pressed
+          }}
+        >
+          {allUsers.map((otherUser) => {
+            const { location, photo, uid } = otherUser;
+            if (location && location.latitude && location.longitude) {
+              return (
+                <Marker
+                  key={uid}
+                  coordinate={{
+                    latitude: location.latitude,
+                    longitude: location.longitude,
+                  }}
+                  onPress={(e) => {
+                    e.stopPropagation();
+                    setSelectedFriendUser(otherUser);
+                    setModalVisible(true);
+                  }}
+                >
+                  <View
+                    style={[styles.markerContainer, styles.otherUserMarker]}
+                  >
+                    <View style={styles.markerPin}>
+                      <Image
+                        source={{ uri: photo }}
+                        style={styles.markerImage}
+                      />
+                    </View>
                   </View>
-                </View>
-              </Marker>
-            );
-          }
-          return null;
-        })}
-      </MapView>
+                </Marker>
+              );
+            }
+            return null;
+          })}
+        </MapView>
+      )}
 
       {/* User Info Modal */}
       {selectedFriendUser && user && (
