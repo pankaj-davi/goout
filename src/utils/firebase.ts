@@ -5,6 +5,8 @@ import { IUser } from '../../src/context/AuthContext';
 import { sendCustomPushNotification } from './pushNotificationService';
 import { useAuth } from '../context/AuthContext'; // Importing useAuth to get user context
 
+import { UserOnboardDetails } from '../screens/OnboardingScreen/OnboardingScreen';
+
 // Helper to update Firestore documents
 const updateFirestoreDoc = async (
   userUid: string,
@@ -299,5 +301,42 @@ export const saveUserLocation = async (
     } catch (error) {
       throw new Error(`Error saving user location: ${(error as any).message}`);
     }
+  }
+};
+
+export const updateUserProfileToFirestore = async (
+  userOnboardDetails: UserOnboardDetails
+) => {
+  try {
+    const currentUser = auth().currentUser;
+
+    // Check if the user is authenticated
+    if (!currentUser) {
+      throw new Error('User not authenticated');
+    }
+
+    // Reference to the user document
+    const userRef = firestore().collection('users').doc(currentUser.uid);
+
+    // Update the document with merge
+    await userRef.set(
+      { ...userOnboardDetails, isOnBoarded: true },
+      { merge: true }
+    );
+
+    console.log('User profile successfully updated');
+
+    // Fetch and log the document fields
+    const userDoc = await userRef.get();
+    if (userDoc.exists) {
+      const fields = userDoc.data();
+      return fields; // Return fields if needed
+    } else {
+      console.log('No document data found for this user.');
+      return null;
+    }
+  } catch (error) {
+    console.error('Error updating user profile:', error);
+    throw error;
   }
 };
