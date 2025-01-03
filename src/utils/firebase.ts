@@ -6,6 +6,7 @@ import { sendCustomPushNotification } from './pushNotificationService';
 import { useAuth } from '../context/AuthContext'; // Importing useAuth to get user context
 
 import { UserOnboardDetails } from '../screens/OnboardingScreen/OnboardingScreen';
+import auth from '@react-native-firebase/auth';
 
 // Helper to update Firestore documents
 const updateFirestoreDoc = async (
@@ -46,20 +47,18 @@ const sendUserNotification = async (
   action: 'friendRequest' | 'friendRequestAccepted'
 ) => {
   if (receiver.deviceToken) {
-    let title, body;
+    const notifications = {
+      friendRequest: {
+        title: `${sender.name} sent you a friend request!`,
+        body: `You have received a friend request from ${sender.name}.`,
+      },
+      friendRequestAccepted: {
+        title: `${sender.name} accepted your friend request!`,
+        body: `You and ${sender.name} are now friends!`,
+      },
+    };
 
-    switch (action) {
-      case 'friendRequest':
-        title = `${sender.name} sent you a friend request!`;
-        body = `You have received a friend request from ${sender.name}.`;
-        break;
-      case 'friendRequestAccepted':
-        title = `${sender.name} accepted your friend request!`;
-        body = `You and ${sender.name} are now friends!`;
-        break;
-      default:
-        throw new Error('Invalid action type');
-    }
+    const { title, body } = notifications[action];
 
     try {
       await sendCustomPushNotification(
