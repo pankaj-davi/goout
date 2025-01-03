@@ -11,23 +11,35 @@ interface FormData {
 }
 
 const EmailLoginScreen: React.FC = () => {
-  const { signInWithEmailAndPassword, createUserWithEmailAndPassword } =
-    useAuth();
+  const {
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    resetPassword,
+  } = useAuth();
+  const [isForgetPassword, setIsForgetPassword] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
-
   const {
     control,
     handleSubmit,
     formState: { errors },
+    getValues,
   } = useForm<FormData>({
-    mode: 'onTouched', // Validate inputs when touched
-    shouldFocusError: true, // Automatically focus on the first invalid field
+    mode: 'onTouched',
+    shouldFocusError: true,
   });
 
   const onSubmit = async (data: FormData) => {
     const { email, password } = data;
     try {
-      if (isRegistering) {
+      if (isForgetPassword) {
+        await resetPassword(email);
+        Alert.alert(
+          'Success',
+          'Password reset email sent! Please check your inbox.'
+        );
+        setIsRegistering(false);
+        ``;
+      } else if (isRegistering) {
         await createUserWithEmailAndPassword(email, password);
       } else {
         await signInWithEmailAndPassword(email, password);
@@ -70,54 +82,72 @@ const EmailLoginScreen: React.FC = () => {
           </View>
         )}
       />
-
-      <Text style={styles.subtitle}>Password</Text>
-      <Controller
-        name="password"
-        control={control}
-        rules={{
-          required: 'Password is required',
-          minLength: {
-            value: 6,
-            message: 'Password must be at least 6 characters long',
-          },
-        }}
-        render={({ field: { onChange, onBlur, value } }) => (
-          <View style={{ position: 'relative', marginBottom: 16 }}>
-            <TextInput
-              style={[styles.input, errors.password && styles.errorInput]}
-              placeholder="Password"
-              secureTextEntry
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-            />
-            {errors.password && (
-              <Text style={styles.errorText}>{errors.password.message}</Text>
+      {!isForgetPassword && (
+        <>
+          <Text style={styles.subtitle}>Password</Text>
+          <Controller
+            name="password"
+            control={control}
+            rules={{
+              required: 'Password is required',
+              minLength: {
+                value: 6,
+                message: 'Password must be at least 6 characters long',
+              },
+            }}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <View style={{ position: 'relative', marginBottom: 16 }}>
+                <TextInput
+                  style={[styles.input, errors.password && styles.errorInput]}
+                  placeholder="Password"
+                  secureTextEntry
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                />
+                {errors.password && (
+                  <Text style={styles.errorText}>
+                    {errors.password.message}
+                  </Text>
+                )}
+              </View>
             )}
-          </View>
-        )}
-      />
-
+          />
+          <Text
+            onPress={() => setIsForgetPassword(true)}
+            style={styles.forgotPassword}
+          >
+            Forgot Password?
+          </Text>
+        </>
+      )}
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={styles.button}
           onPress={handleSubmit(onSubmit)}
         >
           <Text style={styles.buttonText}>
-            {isRegistering ? 'Register' : 'Login'}
+            {isForgetPassword
+              ? 'Forget Password'
+              : isRegistering
+                ? 'Register'
+                : 'Login'}
           </Text>
         </TouchableOpacity>
       </View>
-
-      <Text
-        onPress={() => setIsRegistering(!isRegistering)}
-        style={styles.toggle}
-      >
-        {isRegistering
-          ? 'Already have an account? Login'
-          : "Don't have an account? Register"}
-      </Text>
+      {!isForgetPassword && (
+        <Text
+          onPress={() => setIsRegistering(!isRegistering)}
+          style={styles.toggle}
+        >
+          {isRegistering ? 'Back to Login' : "Don't have an account? Register"}
+        </Text>
+      )}
+      {isForgetPassword && (
+        <Text onPress={() => setIsForgetPassword(false)} style={styles.toggle}>
+          Back to Login
+        </Text>
+      )}
     </View>
   );
 };
@@ -154,7 +184,7 @@ const styles = StyleSheet.create({
     color: theme.colors.error,
     fontSize: 12,
     marginBottom: 10,
-    position: 'absolute', // Absolute positioning
+    position: 'absolute',
     top: 52,
   },
   buttonContainer: {
@@ -175,25 +205,14 @@ const styles = StyleSheet.create({
     color: theme.colors.textLight,
     fontWeight: 'bold',
   },
-  optionContainer: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    alignItems: 'flex-start',
-    marginBottom: 10,
-    columnGap: 10,
-    width: '100%',
-    marginTop: 12,
-  },
-  optionButton: {
-    flex: 1,
-    padding: 10,
-    borderRadius: 25,
-    backgroundColor: theme.colors.backgroundSecondary,
-    alignItems: 'center',
-  },
   toggle: {
     marginTop: 16,
     textAlign: 'center',
+    color: 'blue',
+  },
+  forgotPassword: {
+    marginTop: -10,
+    textAlign: 'right',
     color: 'blue',
   },
 });

@@ -31,6 +31,7 @@ interface AuthContextProps {
   setUser: React.Dispatch<React.SetStateAction<IUser | null>>;
   signInWithEmailAndPassword: (email: string, password: string) => void;
   createUserWithEmailAndPassword: (email: string, password: string) => void;
+  resetPassword: (email: string) => void;
 }
 
 export interface IUser {
@@ -297,6 +298,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
+  const resetPassword = async (email: string) => {
+    try {
+      await auth().sendPasswordResetEmail(email);
+
+      console.log('Password reset email sent successfully');
+    } catch (error) {
+      console.error('Error sending password reset email:', error);
+      throw error;
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -308,6 +320,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         setUser,
         createUserWithEmailAndPassword,
         signInWithEmailAndPassword,
+        resetPassword,
       }}
     >
       {children}
