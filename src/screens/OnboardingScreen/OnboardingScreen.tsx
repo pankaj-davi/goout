@@ -55,13 +55,9 @@ const OnboardingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
   const onSubmit = async (userOnboardDetails: UserOnboardDetails) => {
     try {
-      console.log(
-        userOnboardDetails,
-        '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@'
-      );
-      // await updateUserProfileToFirestore(userOnboardDetails);
+      await updateUserProfileToFirestore(userOnboardDetails);
 
-      // await navigation.navigate('MainTabs');
+      await navigation.navigate('MainTabs');
     } catch (error) {
       Alert.alert('Error', 'An error occurred. Please try again.');
     }
