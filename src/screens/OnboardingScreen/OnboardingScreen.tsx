@@ -55,9 +55,13 @@ const OnboardingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
   const onSubmit = async (userOnboardDetails: UserOnboardDetails) => {
     try {
-      await updateUserProfileToFirestore(userOnboardDetails);
+      console.log(
+        userOnboardDetails,
+        '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@'
+      );
+      // await updateUserProfileToFirestore(userOnboardDetails);
 
-      await navigation.navigate('MainTabs');
+      // await navigation.navigate('MainTabs');
     } catch (error) {
       Alert.alert('Error', 'An error occurred. Please try again.');
     }
@@ -109,6 +113,7 @@ const OnboardingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       <Controller
         control={control}
         name="name"
+        key="name"
         rules={{ required: 'Name is required' }}
         render={({ field: { onChange, value } }) => (
           <>
@@ -138,6 +143,7 @@ const OnboardingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       <Controller
         control={control}
         name="dob"
+        key="dob"
         rules={{
           required: 'Date of birth is required',
           validate: (value) => {
@@ -182,6 +188,7 @@ const OnboardingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       <Controller
         control={control}
         name="gender"
+        key="gender"
         rules={{ required: 'Gender is required' }}
         render={({ field: { onChange, value } }) => (
           <View style={styles.optionContainer}>
@@ -219,6 +226,7 @@ const OnboardingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       <Controller
         control={control}
         name="lifestyle"
+        key={'lifestyle'}
         rules={{ required: 'Please select your lifestyle preference' }}
         render={({ field: { onChange, value } }) => (
           <View style={styles.optionContainer}>
@@ -255,6 +263,7 @@ const OnboardingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       <Text style={styles.subtitle}>Work-Life Balance</Text>
       <Controller
         control={control}
+        key={'workLifeBalance'}
         name="workLifeBalance"
         rules={{
           required: 'Please select your work-life balance preference',
@@ -295,6 +304,7 @@ const OnboardingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       <Controller
         control={control}
         name="purpose"
+        key="purpose"
         rules={{
           required: 'Please select at least one purpose for connecting',
           validate: (value) =>
