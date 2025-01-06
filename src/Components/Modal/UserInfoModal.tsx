@@ -22,6 +22,8 @@ const UserInfoModal: React.FC<UserInfoModalProps> = ({
   onClose,
 }) => {
   const { data: connections, error } = useUserSubCollection('connections');
+  const { data: friends, error: friendsError } =
+    useUserSubCollection('friends');
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
 
@@ -52,9 +54,7 @@ const UserInfoModal: React.FC<UserInfoModalProps> = ({
     onClose();
   };
 
-  const isFriend = connections.some(
-    ({ uid }) => uid === friendSeletedUser?.uid
-  );
+  const isFriend = friends.some(({ uid }) => uid === friendSeletedUser?.uid);
 
   return (
     <TouchableOpacity

@@ -177,17 +177,19 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             if (modalVisible) resetModal();
           }}
         >
-          {allUsers.map((otherUser) => (
-            <MemoizedMarker
-              key={otherUser.uid}
-              otherUser={otherUser}
-              onPress={(e) => {
-                e.stopPropagation();
-                setSelectedFriendUser(otherUser);
-                setModalVisible(true);
-              }}
-            />
-          ))}
+          {allUsers
+            .filter((item) => item.uid !== user?.uid)
+            .map((otherUser) => (
+              <MemoizedMarker
+                key={otherUser.uid}
+                otherUser={otherUser}
+                onPress={(e) => {
+                  e.stopPropagation();
+                  setSelectedFriendUser(otherUser);
+                  setModalVisible(true);
+                }}
+              />
+            ))}
         </MapView>
       )}
       {/* User Info Modal */}
