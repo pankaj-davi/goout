@@ -4376,6 +4376,7 @@ __metadata:
     react-native-reanimated: latest
     react-native-safe-area-context: 4.10.5
     react-native-screens: ^3.34.0
+    react-native-simple-bottom-sheet: ^1.0.4
     react-native-svg: ^15.7.1
     react-native-svg-transformer: ^1.5.0
     react-native-tab-view: ^3.5.2
@@ -9375,6 +9376,15 @@ __metadata:
     react: "*"
     react-native: "*"
   checksum: 28c1f6e556c318ffcbd79d153b9612cc8a0b8d8b70f909d3cde2fd6d0586a7c151a449e57400d8996f4ee6c3b5140c5c4f643a427e974f6dc573b2bcd8eb7356
+  languageName: node
+  linkType: hard
+
+"react-native-simple-bottom-sheet@npm:^1.0.4":
+  version: 1.0.4
+  resolution: "react-native-simple-bottom-sheet@npm:1.0.4"
+  dependencies:
+    prop-types: ^15.7.2
+  checksum: ccdf7915ed586063b4b7254dda6c9eda25b597fa309b12753277913525599187b0e85453b71570095f59d5a641ed3c1c44c4721f59675d65a4393e89d9317efb
   languageName: node
   linkType: hard
 

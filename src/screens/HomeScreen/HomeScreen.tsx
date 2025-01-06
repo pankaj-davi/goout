@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { StyleSheet, View, Alert, Image, Text } from 'react-native';
 import { colors } from '../../theme/colors';
 import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
@@ -15,6 +15,14 @@ import {
 interface GeoPoint {
   latitude: number;
   longitude: number;
+}
+
+export interface IUserGeoPoint {
+  uid: string;
+  name: string;
+  email: string;
+  photo?: string;
+  location?: GeoPoint; // Add the location property
 }
 
 const styles = StyleSheet.create({
@@ -74,6 +82,46 @@ const styles = StyleSheet.create({
   },
 });
 
+// Memoized Marker Component
+interface MemoizedMarkerProps {
+  otherUser: IUserGeoPoint;
+  onPress: (event: any) => void;
+}
+
+const MemoizedMarker = memo(({ otherUser, onPress }: MemoizedMarkerProps) => {
+  const { location, photo, uid, name } = otherUser;
+  if (location && location.latitude && location.longitude) {
+    return (
+      <Marker
+        key={uid}
+        coordinate={{
+          latitude: location.latitude,
+          longitude: location.longitude,
+        }}
+        onPress={onPress}
+      >
+        <View
+          key={uid}
+          style={[styles.markerContainer, styles.otherUserMarker]}
+        >
+          <View style={styles.markerPin}>
+            {photo ? (
+              <Image source={{ uri: photo }} style={styles.markerImage} />
+            ) : (
+              <View style={styles.markerImage}>
+                <Text style={styles.markerText}>
+                  {name.charAt(0).toUpperCase()}
+                </Text>
+              </View>
+            )}
+          </View>
+        </View>
+      </Marker>
+    );
+  }
+  return null;
+});
+
 // Main component
 const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const { user } = useAuth();
@@ -129,45 +177,17 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             if (modalVisible) resetModal();
           }}
         >
-          {allUsers.map((otherUser) => {
-            const { location, photo, uid, name } = otherUser;
-            if (location && location.latitude && location.longitude) {
-              return (
-                <Marker
-                  key={uid}
-                  coordinate={{
-                    latitude: location.latitude,
-                    longitude: location.longitude,
-                  }}
-                  onPress={(e) => {
-                    e.stopPropagation();
-                    setSelectedFriendUser(otherUser);
-                    setModalVisible(true);
-                  }}
-                >
-                  <View
-                    style={[styles.markerContainer, styles.otherUserMarker]}
-                  >
-                    <View style={styles.markerPin}>
-                      {photo ? (
-                        <Image
-                          source={{ uri: photo }}
-                          style={styles.markerImage}
-                        />
-                      ) : (
-                        <View style={styles.markerImage}>
-                          <Text style={styles.markerText}>
-                            {name.charAt(0).toUpperCase()}
-                          </Text>
-                        </View>
-                      )}
-                    </View>
-                  </View>
-                </Marker>
-              );
-            }
-            return null;
-          })}
+          {allUsers.map((otherUser) => (
+            <MemoizedMarker
+              key={otherUser.uid}
+              otherUser={otherUser}
+              onPress={(e) => {
+                e.stopPropagation();
+                setSelectedFriendUser(otherUser);
+                setModalVisible(true);
+              }}
+            />
+          ))}
         </MapView>
       )}
       {/* User Info Modal */}
