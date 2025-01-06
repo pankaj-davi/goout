@@ -24,6 +24,8 @@ export interface UserOnboardDetails {
   workLifeBalance: string;
   purpose: string[];
   bio: string; // Add bio field
+  jobTitle: string; // Add job title field
+  companyName: string; // Add company name field
 }
 
 const OnboardingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
@@ -49,6 +51,8 @@ const OnboardingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       workLifeBalance: '',
       purpose: [],
       bio: '', // Add bio default value
+      jobTitle: '', // Add job title default value
+      companyName: '', // Add company name default value
     },
     mode: 'onTouched',
     shouldFocusError: true,
@@ -192,6 +196,58 @@ const OnboardingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             />
             {errors.bio && (
               <Text style={styles.errorText}>{errors.bio.message}</Text>
+            )}
+          </>
+        )}
+      />
+    </View>
+  );
+
+  const renderJobTitleInput = () => (
+    <View>
+      <Text style={styles.subtitle}>Job Title</Text>
+      <Controller
+        control={control}
+        name="jobTitle"
+        key="jobTitle"
+        rules={{ required: 'Job title is required' }}
+        render={({ field: { onChange, value } }) => (
+          <>
+            <TextInput
+              style={[styles.input, errors.jobTitle && styles.errorInput]}
+              placeholder="Enter your job title"
+              value={value}
+              onChangeText={onChange}
+              placeholderTextColor="#B0B0B0"
+            />
+            {errors.jobTitle && (
+              <Text style={styles.errorText}>{errors.jobTitle.message}</Text>
+            )}
+          </>
+        )}
+      />
+    </View>
+  );
+
+  const renderCompanyNameInput = () => (
+    <View>
+      <Text style={styles.subtitle}>Company Name</Text>
+      <Controller
+        control={control}
+        name="companyName"
+        key="companyName"
+        rules={{ required: 'Company name is required' }}
+        render={({ field: { onChange, value } }) => (
+          <>
+            <TextInput
+              style={[styles.input, errors.companyName && styles.errorInput]}
+              placeholder="Enter your company name"
+              value={value}
+              onChangeText={onChange}
+              placeholderTextColor="#B0B0B0"
+            />
+            {errors.companyName && (
+              <Text style={styles.errorText}>{errors.companyName.message}</Text>
             )}
           </>
         )}
@@ -383,12 +439,19 @@ const OnboardingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       case 3:
         return renderBioInput();
       case 4:
-        return renderGenderSelection();
+        return (
+          <>
+            {renderJobTitleInput()}
+            {renderCompanyNameInput()}
+          </>
+        );
       case 5:
-        return renderLifestylePreferences();
+        return renderGenderSelection();
       case 6:
-        return renderWorkLifeBalancePreferences();
+        return renderLifestylePreferences();
       case 7:
+        return renderWorkLifeBalancePreferences();
+      case 8:
         return renderPurposeSelection();
       default:
         return null;
@@ -404,7 +467,7 @@ const OnboardingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           onPress={async () => {
             const isValid = await trigger();
             if (isValid) {
-              if (step < 7) {
+              if (step < 8) {
                 setStep(step + 1);
               } else {
                 handleSubmit(onSubmit)();
@@ -416,7 +479,7 @@ const OnboardingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           }}
         >
           <Text style={styles.buttonText}>
-            {step === 7 ? 'Submit' : 'Continue'}
+            {step === 8 ? 'Submit' : 'Continue'}
           </Text>
         </TouchableOpacity>
       </View>
