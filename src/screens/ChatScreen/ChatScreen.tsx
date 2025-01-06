@@ -36,49 +36,58 @@ const ChatScreen: React.FC = ({ route }: any) => {
 
   const sendMessage = async () => {
     if (newMessage.trim() === '') return;
-    await firestore()
-      .collection('chats')
-      .doc(chatId)
-      .collection('messages')
-      .add({
-        message: newMessage,
-        sender: user.uid,
-        senderName: user.name,
-        timestamp: firestore.FieldValue.serverTimestamp(),
-      });
-    setNewMessage('');
+    if (user) {
+      await firestore()
+        .collection('chats')
+        .doc(chatId)
+        .collection('messages')
+        .add({
+          message: newMessage,
+          sender: user.uid,
+          senderName: user.name,
+          timestamp: firestore.FieldValue.serverTimestamp(),
+        });
+      setNewMessage('');
+    }
   };
 
   return (
     <View style={styles.container}>
-      <FlatList
-        data={messages}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <ChatMessage
-            senderName={item.senderName}
-            message={item.message}
-            timestamp={
-              item.timestamp ? item.timestamp.toDate().toLocaleString() : ''
-            }
-            isCurrentUser={item.sender === user.uid}
+      {user && (
+        <>
+          <FlatList
+            data={messages}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <ChatMessage
+                senderName={item.senderName}
+                message={item.message}
+                timestamp={
+                  item.timestamp ? item.timestamp.toDate().toLocaleString() : ''
+                }
+                isCurrentUser={item.sender === user.uid}
+              />
+            )}
           />
-        )}
-      />
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          value={newMessage}
-          onChangeText={setNewMessage}
-          placeholder="Type a message"
-          placeholderTextColor={theme.colors.text}
-          multiline={true}
-          returnKeyType="default"
-        />
-        <TouchableOpacity style={styles.iconContainer} onPress={sendMessage}>
-          <Icon name="send" size={25} color={theme.colors.primary} />
-        </TouchableOpacity>
-      </View>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              value={newMessage}
+              onChangeText={setNewMessage}
+              placeholder="Type a message"
+              placeholderTextColor={theme.colors.text}
+              multiline={true}
+              returnKeyType="default"
+            />
+            <TouchableOpacity
+              style={styles.iconContainer}
+              onPress={sendMessage}
+            >
+              <Icon name="send" size={25} color={theme.colors.primary} />
+            </TouchableOpacity>
+          </View>
+        </>
+      )}
     </View>
   );
 };

@@ -13,7 +13,7 @@ const FriendsScreen: React.FC = () => {
 
   const navigation = useNavigation();
   const { error, data: friends, loading } = useUserSubCollection('friends');
-  const currentUserId = user.uid;
+  const currentUserId = user && user.uid;
   const handleFriendPress = (
     friendUid: string,
     friendName: string,

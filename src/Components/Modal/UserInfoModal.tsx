@@ -6,6 +6,7 @@ import { IUser } from '../../../src/context/AuthContext';
 import { addFriendRequest } from '../../../src/utils/firebase';
 import { useUserSubCollection } from '../../../src/hooks/useUserSubCollection';
 import { colors } from '../../../src/theme/colors'; // Import colors
+import { useNavigation } from '@react-navigation/native';
 
 interface UserInfoModalProps {
   visible: boolean;
@@ -22,6 +23,7 @@ const UserInfoModal: React.FC<UserInfoModalProps> = ({
 }) => {
   const { data: connections, error } = useUserSubCollection('connections');
   const [loading, setLoading] = useState(false);
+  const navigation = useNavigation();
 
   // Check if the selected user is already a friend
   const isFriendRequestState = connections
@@ -38,6 +40,21 @@ const UserInfoModal: React.FC<UserInfoModalProps> = ({
       console.log(err);
     }
   };
+
+  const handleChat = () => {
+    const chatId = [currentUser.uid, friendSeletedUser.uid].sort().join('_');
+    //@ts-ignore
+    navigation.navigate('ChatScreen', {
+      chatId,
+      friendImage: friendSeletedUser.photo,
+      friendName: friendSeletedUser.name,
+    });
+    onClose();
+  };
+
+  const isFriend = connections.some(
+    ({ uid }) => uid === friendSeletedUser?.uid
+  );
 
   return (
     <TouchableOpacity
@@ -63,24 +80,34 @@ const UserInfoModal: React.FC<UserInfoModalProps> = ({
                 <Text style={styles.modalText}>{friendSeletedUser.name}</Text>
               </View>
               <View style={styles.buttonContainer}>
-                <TouchableOpacity
-                  onPress={handleAddFriend}
-                  disabled={isFriendRequestState || loading}
-                  style={[
-                    styles.primaryButton,
-                    (isFriendRequestState || loading) && styles.disabledButton,
-                  ]}
-                  accessible={true}
-                  accessibilityLabel="Send friend request"
-                >
-                  <Text style={styles.buttonText}>
-                    {loading
-                      ? 'Sending...'
-                      : isFriendRequestState
-                        ? 'Pending'
-                        : 'Send Request'}
-                  </Text>
-                </TouchableOpacity>
+                {isFriend ? (
+                  <TouchableOpacity
+                    onPress={handleChat}
+                    style={styles.primaryButton}
+                  >
+                    <Text style={styles.buttonText}>Chat</Text>
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity
+                    onPress={handleAddFriend}
+                    disabled={isFriendRequestState || loading}
+                    style={[
+                      styles.primaryButton,
+                      (isFriendRequestState || loading) &&
+                        styles.disabledButton,
+                    ]}
+                    accessible={true}
+                    accessibilityLabel="Send friend request"
+                  >
+                    <Text style={styles.buttonText}>
+                      {loading
+                        ? 'Sending...'
+                        : isFriendRequestState
+                          ? 'Pending'
+                          : 'Add Friend'}
+                    </Text>
+                  </TouchableOpacity>
+                )}
               </View>
             </>
           )}
