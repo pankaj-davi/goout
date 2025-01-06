@@ -54,6 +54,20 @@ const UserInfoModal: React.FC<UserInfoModalProps> = ({
     onClose();
   };
 
+  const calculateAge = (dob: string) => {
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDifference = today.getMonth() - birthDate.getMonth();
+    if (
+      monthDifference < 0 ||
+      (monthDifference === 0 && today.getDate() < birthDate.getDate())
+    ) {
+      age--;
+    }
+    return age;
+  };
+
   const isFriend = friends.some(({ uid }) => uid === friendSeletedUser?.uid);
 
   return (
@@ -77,7 +91,14 @@ const UserInfoModal: React.FC<UserInfoModalProps> = ({
                     style={styles.modalImage}
                   />
                 ) : null}
-                <Text style={styles.modalText}>{friendSeletedUser.name}</Text>
+                <View>
+                  <Text style={styles.modalText}>{friendSeletedUser.name}</Text>
+                  {friendSeletedUser.dob && (
+                    <Text style={styles.modalText}>
+                      Age: {calculateAge(friendSeletedUser.dob)}
+                    </Text>
+                  )}
+                </View>
               </View>
               <View style={styles.buttonContainer}>
                 {isFriend ? (
@@ -140,6 +161,8 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
+    alignContent: 'center',
+    justifyContent: 'center',
     alignItems: 'flex-start',
     marginBottom: 10,
   },

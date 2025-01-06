@@ -44,6 +44,7 @@ export interface IUser {
   isNewUser: boolean;
   isOnBoarded: boolean;
   phoneNumber?: string;
+  dob?: string | null;
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
