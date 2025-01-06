@@ -8,10 +8,17 @@ import { useUserSubCollection } from '../../../src/hooks/useUserSubCollection';
 import { colors } from '../../../src/theme/colors'; // Import colors
 import { useNavigation } from '@react-navigation/native';
 
+interface IUserProps extends IUser {
+  dob: string;
+  bio: string;
+  jobTitle: string;
+  companyName: string;
+}
+
 interface UserInfoModalProps {
   visible: boolean;
-  currentUser: IUser;
-  friendSeletedUser: IUser;
+  currentUser: IUserProps;
+  friendSeletedUser: IUserProps;
   onClose: () => void;
 }
 
@@ -92,11 +99,49 @@ const UserInfoModal: React.FC<UserInfoModalProps> = ({
                   />
                 ) : null}
                 <View>
-                  <Text style={styles.modalText}>{friendSeletedUser.name}</Text>
+                  <Text style={styles.modalName}>{friendSeletedUser.name}</Text>
                   {friendSeletedUser.dob && (
-                    <Text style={styles.modalText}>
-                      Age: {calculateAge(friendSeletedUser.dob)}
-                    </Text>
+                    <View style={styles.infoRow}>
+                      <Icon
+                        name="calendar"
+                        size={20}
+                        color={colors.primaryLight}
+                      />
+                      <Text style={styles.modalText}>
+                        Age: {calculateAge(friendSeletedUser.dob)}
+                      </Text>
+                    </View>
+                  )}
+                  {friendSeletedUser.jobTitle && (
+                    <View style={styles.infoRow}>
+                      <Icon
+                        name="briefcase"
+                        size={20}
+                        color={colors.primaryLight}
+                      />
+                      <Text style={styles.modalText}>
+                        {friendSeletedUser.jobTitle}
+                      </Text>
+                    </View>
+                  )}
+                  {friendSeletedUser.companyName && (
+                    <View style={styles.infoRow}>
+                      <Icon
+                        name="business"
+                        size={20}
+                        color={colors.primaryLight}
+                      />
+                      <Text style={styles.modalText}>
+                        {friendSeletedUser.companyName}
+                      </Text>
+                    </View>
+                  )}
+                  {friendSeletedUser.bio && (
+                    <View style={styles.infoRow}>
+                      <Text style={styles.modalText}>
+                        {friendSeletedUser.bio}
+                      </Text>
+                    </View>
                   )}
                 </View>
               </View>
@@ -172,9 +217,15 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     marginRight: 10,
   },
+  modalName: {
+    fontSize: 20,
+    color: colors.text,
+    fontWeight: 'bold',
+    marginBottom: 10, // Add margin bottom
+  },
   modalText: {
     fontSize: 16,
-    color: colors.text,
+    color: colors.textSecondary,
   },
   closeIcon: {
     position: 'absolute',
@@ -202,6 +253,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     fontSize: 12,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    columnGap: 8,
+    marginTop: 8,
   },
 });
 
