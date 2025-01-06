@@ -23,6 +23,7 @@ export interface UserOnboardDetails {
   lifestyle: string;
   workLifeBalance: string;
   purpose: string[];
+  bio: string; // Add bio field
 }
 
 const OnboardingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
@@ -47,6 +48,7 @@ const OnboardingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       lifestyle: '',
       workLifeBalance: '',
       purpose: [],
+      bio: '', // Add bio default value
     },
     mode: 'onTouched',
     shouldFocusError: true,
@@ -82,25 +84,6 @@ const OnboardingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     }
 
     setShowDatePicker(false);
-  };
-
-  const renderStepContent = () => {
-    switch (step) {
-      case 1:
-        return renderNameInput();
-      case 2:
-        return renderDateOfBirthInput();
-      case 3:
-        return renderGenderSelection();
-      case 4:
-        return renderLifestylePreferences();
-      case 5:
-        return renderWorkLifeBalancePreferences();
-      case 6:
-        return renderPurposeSelection();
-      default:
-        return null;
-    }
   };
 
   const renderNameInput = () => (
@@ -171,6 +154,44 @@ const OnboardingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 display={Platform.OS === 'ios' ? 'spinner' : 'default'}
                 onChange={onDateChange}
               />
+            )}
+          </>
+        )}
+      />
+    </View>
+  );
+
+  const renderBioInput = () => (
+    <View>
+      <Text style={styles.subtitle}>Bio</Text>
+      <Controller
+        control={control}
+        name="bio"
+        key="bio"
+        rules={{
+          required: 'Bio is required',
+          maxLength: {
+            value: 200,
+            message: 'Bio cannot be more than 200 characters',
+          },
+        }}
+        render={({ field: { onChange, value } }) => (
+          <>
+            <TextInput
+              style={[
+                styles.input,
+                styles.textArea,
+                errors.bio && styles.errorInput,
+              ]}
+              placeholder="Write something about yourself"
+              value={value}
+              onChangeText={onChange}
+              multiline={true}
+              numberOfLines={4}
+              placeholderTextColor="#B0B0B0"
+            />
+            {errors.bio && (
+              <Text style={styles.errorText}>{errors.bio.message}</Text>
             )}
           </>
         )}
@@ -353,6 +374,27 @@ const OnboardingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     </View>
   );
 
+  const renderStepContent = () => {
+    switch (step) {
+      case 1:
+        return renderNameInput();
+      case 2:
+        return renderDateOfBirthInput();
+      case 3:
+        return renderBioInput();
+      case 4:
+        return renderGenderSelection();
+      case 5:
+        return renderLifestylePreferences();
+      case 6:
+        return renderWorkLifeBalancePreferences();
+      case 7:
+        return renderPurposeSelection();
+      default:
+        return null;
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.content}>{renderStepContent()}</View>
@@ -362,7 +404,7 @@ const OnboardingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           onPress={async () => {
             const isValid = await trigger();
             if (isValid) {
-              if (step < 6) {
+              if (step < 7) {
                 setStep(step + 1);
               } else {
                 handleSubmit(onSubmit)();
@@ -374,7 +416,7 @@ const OnboardingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           }}
         >
           <Text style={styles.buttonText}>
-            {step === 6 ? 'Submit' : 'Continue'}
+            {step === 7 ? 'Submit' : 'Continue'}
           </Text>
         </TouchableOpacity>
       </View>
@@ -412,6 +454,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     color: theme.colors.text,
     backgroundColor: '#fff',
+  },
+  textArea: {
+    height: 100,
+    textAlignVertical: 'top',
   },
   errorInput: {
     borderColor: theme.colors.error,
