@@ -1,127 +1,302 @@
-import React, { useState, useEffect, useRef, memo } from 'react';
+import 'react-native-get-random-values';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
-  FlatList,
-  TextInput,
-  TouchableOpacity,
   StyleSheet,
+  TouchableOpacity,
+  TextInput,
+  Image,
+  Platform,
 } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
 import firestore from '@react-native-firebase/firestore';
+// import storage from '@react-native-firebase/storage';
+import DocumentPicker from 'react-native-document-picker';
+import {
+  GiftedChat,
+  IMessage,
+  Bubble,
+  InputToolbar,
+  InputToolbarProps,
+} from 'react-native-gifted-chat';
 import Icon from 'react-native-vector-icons/Ionicons';
-import ChatMessage from '../../components/ChatMessage/ChatMessage';
 import { sendCustomPushNotification } from '../../utils/pushNotificationService';
-import { theme } from '../../theme/index';
+import { theme } from '../../theme';
+import { requestMediaPermissions } from '../../utils/permissions';
 
-// Memoize the ChatMessage component
-const MemoizedChatMessage = memo(ChatMessage);
+interface ChatScreenProps {
+  route: {
+    params: {
+      chatId: string;
+      friendDeviceToken: string;
+      friendName: string;
+    };
+  };
+  navigation: any;
+}
 
-const ChatScreen: React.FC = ({ route, navigation }: any) => {
+// Extend the IMessage type to include the file property
+interface CustomMessage extends IMessage {
+  file?: {
+    url: string;
+    name: string;
+    type: string;
+  };
+}
+
+// Function to convert URI to Blob
+export const uriToBlob = (uri: string): Promise<Blob> => {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.onload = function () {
+      resolve(xhr.response);
+    };
+    xhr.onerror = function () {
+      reject(new Error('uriToBlob failed'));
+    };
+    xhr.responseType = 'blob';
+    xhr.open('GET', uri, true);
+    xhr.send(null);
+  });
+};
+
+// Function to upload file to Firebase Storage
+// export async function uploadFile(
+//   uri: string,
+//   filename: string,
+//   folder: string
+// ): Promise<string | null> {
+//   if (!filename) return null;
+//   const storageRef = storage().ref(`${folder}/${filename}`);
+//   const blobFile = await uriToBlob(uri);
+//   try {
+//     await storageRef.put(blobFile);
+//     const url = await storageRef.getDownloadURL();
+//     return url;
+//   } catch (err) {
+//     console.log(err);
+//     return null;
+//   }
+// }
+
+const ChatScreen: React.FC<ChatScreenProps> = ({ route, navigation }) => {
   const { user } = useAuth();
-  const [messages, setMessages] = useState<any[]>([]);
+  const [messages, setMessages] = useState<CustomMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
-  const chatId = route.params.chatId;
-  const friendDeviceToken = route.params.friendDeviceToken;
-  const friendName = route.params.friendName;
-  const flatListRef = useRef<FlatList>(null);
+  const [selectedFile, setSelectedFile] = useState<any>(null);
+  const { chatId, friendDeviceToken, friendName } = route.params;
+  console.log('ChatScreen:', friendDeviceToken);
 
   useEffect(() => {
     const unsubscribe = firestore()
       .collection('chats')
       .doc(chatId)
       .collection('messages')
-      .orderBy('timestamp')
+      .orderBy('timestamp', 'desc')
       .onSnapshot((snapshot) => {
-        const messages = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+        const messages = snapshot.docs.map((doc) => {
+          const firebaseData = doc.data();
+
+          const data: CustomMessage = {
+            _id: doc.id,
+            text: firebaseData.message,
+            createdAt: firebaseData.timestamp
+              ? firebaseData.timestamp.toDate()
+              : new Date(),
+            user: {
+              _id: firebaseData.sender,
+              name: firebaseData.senderName,
+              avatar: user?.photo || '',
+            },
+            image: firebaseData.image || undefined,
+            file: firebaseData.file || undefined,
+          };
+
+          return data;
+        });
         setMessages(messages);
-        flatListRef.current?.scrollToEnd({ animated: true });
       });
     return () => unsubscribe();
-  }, [chatId]);
+  }, [chatId, user?.photo]);
 
-  const sendMessage = async () => {
-    if (newMessage.trim() === '') return;
-    if (user) {
-      await firestore()
-        .collection('chats')
-        .doc(chatId)
-        .collection('messages')
-        .add({
-          message: newMessage,
-          sender: user.uid,
-          senderName: user.name,
-          timestamp: firestore.FieldValue.serverTimestamp(),
-        });
+  const onSend = useCallback(
+    async (messages: CustomMessage[] = []) => {
+      const { text, user: messageUser } = messages[0];
 
-      // Send notification to the recipient in the background
-      sendCustomPushNotification(
-        friendDeviceToken,
-        friendName,
-        newMessage,
-        chatId,
-        user.photo
-      );
+      let fileData = null;
+      if (selectedFile) {
+        try {
+          const fileUri = selectedFile.uri;
+          const fileName = selectedFile.name;
+          const fileType = selectedFile.type;
 
-      setNewMessage('');
-    }
+          console.log('Uploading file:', { fileUri, fileName, fileType });
+          const fileUrl = await uploadFile(fileUri, fileName, 'files');
+          console.log('File uploaded:', fileUrl);
+          if (fileUrl) {
+            fileData = {
+              url: fileUrl,
+              name: fileName,
+              type: fileType,
+            };
+          } else {
+            console.error('Error uploading file: fileUrl is null');
+          }
+        } catch (error) {
+          console.error('Error uploading file:', error);
+        }
+      }
+
+      try {
+        await firestore()
+          .collection('chats')
+          .doc(chatId)
+          .collection('messages')
+          .add({
+            message: text,
+            sender: user?.uid,
+            senderName: user?.name,
+            timestamp: firestore.FieldValue.serverTimestamp(),
+            file: fileData,
+          });
+
+        // Send notification to the recipient in the background
+        await sendCustomPushNotification(
+          friendDeviceToken,
+          friendName,
+          text,
+          chatId,
+          user?.photo || ''
+        );
+
+        setMessages((previousMessages) =>
+          GiftedChat.append(previousMessages, messages)
+        );
+        setSelectedFile(null); // Clear the selected file after sending the message
+      } catch (error) {
+        console.error('Error saving message to Firestore:', error);
+      }
+    },
+    [selectedFile]
+  );
+
+  // const handleFilePick = async () => {
+  //   try {
+  //     const permissionGranted = await requestMediaPermissions();
+  //     if (!permissionGranted) {
+  //       console.log('Permission not granted');
+  //       return;
+  //     }
+
+  //     const result = await DocumentPicker.pickSingle({
+  //       type: [DocumentPicker.types.allFiles],
+  //     });
+
+  //     if (result) {
+  //       console.log('File picked:', result);
+  //       setSelectedFile(result); // Store the selected file in the state
+  //     }
+  //   } catch (error) {
+  //     if (DocumentPicker.isCancel(error)) {
+  //       console.log('User cancelled the picker');
+  //     } else {
+  //       console.error('Error picking file:', error);
+  //     }
+  //   }
+  // };
+
+  const sendMessage = () => {
+    if (newMessage.trim() === '' && !selectedFile) return;
+    onSend([
+      {
+        text: newMessage,
+        user: {
+          _id: user?.uid || '',
+          name: user?.name || '',
+          avatar: user?.photo || '',
+        },
+        createdAt: new Date(),
+        _id: Math.random().toString(),
+        file: selectedFile
+          ? {
+              url: '',
+              name: selectedFile.name,
+              type: selectedFile.type,
+            }
+          : undefined,
+      },
+    ]);
+    setNewMessage('');
   };
 
-  const keyExtractor = (item: any) => item.id;
+  const renderInputToolbar = () => {
+    return (
+      <View style={styles.inputContainer}>
+        <TouchableOpacity
+          style={styles.fileButton}
+          // onPress={handleFilePick}
+        >
+          <Icon name="attach" size={30} color={theme.colors.primary} />
+        </TouchableOpacity>
+        <TextInput
+          style={styles.input}
+          value={newMessage}
+          onChangeText={setNewMessage}
+          placeholder="Type a message"
+          placeholderTextColor={theme.colors.text}
+          multiline={true}
+          returnKeyType="default"
+        />
+        {selectedFile && (
+          <Image
+            source={{ uri: selectedFile.uri }}
+            style={styles.filePreview}
+          />
+        )}
+        <TouchableOpacity style={styles.iconContainer} onPress={sendMessage}>
+          <Icon name="send" size={25} color={theme.colors.primary} />
+        </TouchableOpacity>
+      </View>
+    );
+  };
 
-  const getItemLayout = (data: any, index: number) => ({
-    length: 70, // Approximate height of each item
-    offset: 70 * index,
-    index,
-  });
+  if (!user) {
+    return null; // or handle the null case appropriately
+  }
 
   return (
     <View style={styles.container}>
-      {user && (
-        <>
-          <FlatList
-            ref={flatListRef}
-            data={messages}
-            keyExtractor={keyExtractor}
-            renderItem={({ item }) => (
-              <MemoizedChatMessage
-                senderName={item.senderName}
-                message={item.message}
-                timestamp={
-                  item.timestamp ? item.timestamp.toDate().toLocaleString() : ''
-                }
-                isCurrentUser={item.sender === user.uid}
-              />
-            )}
-            getItemLayout={getItemLayout}
-            onContentSizeChange={() =>
-              flatListRef.current?.scrollToEnd({ animated: true })
-            }
-            onLayout={() =>
-              flatListRef.current?.scrollToEnd({ animated: false })
-            }
+      <GiftedChat
+        messages={messages}
+        onSend={(messages) => onSend(messages)}
+        user={{
+          _id: user.uid,
+          name: user.name,
+          avatar: user.photo,
+        }}
+        renderBubble={(props) => (
+          <Bubble
+            {...props}
+            wrapperStyle={{
+              left: {
+                backgroundColor: theme.colors.messageBubble,
+              },
+              right: {
+                backgroundColor: theme.colors.messageBubbleSent,
+              },
+            }}
+            textStyle={{
+              left: {
+                color: theme.colors.messageText,
+              },
+              right: {
+                color: theme.colors.messageTextOwn,
+              },
+            }}
           />
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              value={newMessage}
-              onChangeText={setNewMessage}
-              placeholder="Type a message"
-              placeholderTextColor={theme.colors.text}
-              multiline={true}
-              returnKeyType="default"
-            />
-            <TouchableOpacity
-              style={styles.iconContainer}
-              onPress={sendMessage}
-            >
-              <Icon name="send" size={25} color={theme.colors.primary} />
-            </TouchableOpacity>
-          </View>
-        </>
-      )}
+        )}
+        renderInputToolbar={renderInputToolbar}
+      />
     </View>
   );
 };
@@ -129,15 +304,17 @@ const ChatScreen: React.FC = ({ route, navigation }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 10,
+    backgroundColor: theme.colors.background,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 10,
+    paddingHorizontal: 10,
+    backgroundColor: theme.colors.background,
   },
   input: {
-    width: '100%',
+    flex: 1,
     minHeight: 50,
     maxHeight: 150,
     borderColor: theme.colors.border,
@@ -148,11 +325,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     textAlignVertical: 'top',
   },
+  fileButton: {
+    marginRight: 10,
+  },
+  filePreview: {
+    width: 50,
+    height: 50,
+    marginLeft: 10,
+  },
   iconContainer: {
-    position: 'absolute',
-    right: 15,
-    top: '55%',
-    transform: [{ translateY: -15 }],
+    marginLeft: 10,
   },
 });
 
