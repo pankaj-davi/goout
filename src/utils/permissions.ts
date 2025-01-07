@@ -1,5 +1,4 @@
-// src/utils/permissions.ts
-import { PermissionsAndroid, Platform } from 'react-native';
+import { PermissionsAndroid, Platform, Alert } from 'react-native';
 
 export const requestLocationPermission = async () => {
   if (Platform.OS === 'android') {
@@ -28,3 +27,91 @@ export const requestLocationPermission = async () => {
   }
   return true; // Assume permission is granted on iOS or other platforms
 };
+
+// export const requestMediaPermissions = async () => {
+//   if (Platform.OS === 'android') {
+//     const androidVersion = Platform.Version; // Returns the version as a number
+//     console.log(`Current Android version: ${androidVersion}`);
+//     try {
+//       if (androidVersion >= 33) {
+//         // Handle Android 13+ permissions
+//         const permissions = [
+//           PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
+//           PermissionsAndroid.PERMISSIONS.READ_MEDIA_VIDEO,
+//           PermissionsAndroid.PERMISSIONS.READ_MEDIA_AUDIO,
+//         ];
+
+//         const granted = await PermissionsAndroid.requestMultiple(permissions);
+
+//         const allGranted = Object.values(granted).every(
+//           (result) => result === PermissionsAndroid.RESULTS.GRANTED
+//         );
+
+//         if (allGranted) {
+//           console.log('Media permissions granted for Android 13+');
+//           return true;
+//         } else {
+//           console.log('Media permissions denied for Android 13+');
+//           return false;
+//         }
+//       } else {
+//         // Handle older Android versions
+//         const grantedStorage = await PermissionsAndroid.request(
+//           PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+//           {
+//             title: 'Storage Access Required',
+//             message: 'This app needs to access your storage.',
+//             buttonNeutral: 'Ask Me Later',
+//             buttonNegative: 'Cancel',
+//             buttonPositive: 'OK',
+//           }
+//         );
+
+//         const grantedCamera = await PermissionsAndroid.request(
+//           PermissionsAndroid.PERMISSIONS.CAMERA,
+//           {
+//             title: 'Camera Access Required',
+//             message: 'This app needs to access your camera.',
+//             buttonNeutral: 'Ask Me Later',
+//             buttonNegative: 'Cancel',
+//             buttonPositive: 'OK',
+//           }
+//         );
+
+//         if (
+//           grantedStorage === PermissionsAndroid.RESULTS.GRANTED &&
+//           grantedCamera === PermissionsAndroid.RESULTS.GRANTED
+//         ) {
+//           console.log('Media permissions granted');
+//           return true;
+//         } else {
+//           console.log('Media permissions denied');
+//           return false;
+//         }
+//       }
+//     } catch (err) {
+//       console.error('Error requesting permissions:', err);
+//       return false;
+//     }
+//   } else if (Platform.OS === 'ios') {
+//     // iOS permissions
+//     try {
+//       const permissions = [
+//         PERMISSIONS.IOS.PHOTO_LIBRARY,
+//         PERMISSIONS.IOS.CAMERA,
+//       ];
+//       for (const permission of permissions) {
+//         const result = await request(permission);
+//         if (result !== RESULTS.GRANTED) {
+//           Alert.alert(`Permission ${permission} denied`);
+//           return false;
+//         }
+//       }
+//       return true;
+//     } catch (err) {
+//       console.error(err);
+//       return false;
+//     }
+//   }
+//   return true;
+// };
