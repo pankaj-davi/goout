@@ -36,8 +36,8 @@ interface AuthContextProps {
 
 export interface IUser {
   uid: string;
-  name: string | '';
-  photo: string | '';
+  name: string;
+  photo: string;
   email: string | null;
   photoURL: string | null;
   deviceToken: string;
@@ -100,24 +100,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   const saveUserDataToFirestore = async (userData: IUser) => {
     try {
-      console.log('Starting to save user data to Firestore...');
       const userDocRef = firestore().collection('users').doc(userData.uid);
-      console.log('User document reference obtained:', userDocRef.id);
       const doc = await userDocRef.get();
-      console.log(
-        'User document fetched:',
-        doc.exists ? 'exists' : 'does not exist'
-      );
       if (!doc.exists) {
-        console.log('User document does not exist. Creating new document...');
         await userDocRef.set(userData);
-        console.log('User document created successfully');
       } else {
-        console.log('User document exists. Updating document...');
         await userDocRef.update(userData);
-        console.log('User document updated successfully');
       }
-      console.log('User data saved to Firestore successfully');
     } catch (err) {
       console.error('Error saving user data to Firestore:', err);
       throw err;

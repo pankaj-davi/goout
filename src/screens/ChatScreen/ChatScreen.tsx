@@ -11,12 +11,15 @@ import ChatMessage from './../../components/ChatMessage/ChatMessage';
 import { useAuth } from '../../../src/context/AuthContext';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { theme } from '../../theme/index';
+import { sendCustomPushNotification } from '../../utils/pushNotificationService';
 
-const ChatScreen: React.FC = ({ route }: any) => {
+const ChatScreen: React.FC = ({ route, navigation }: any) => {
   const { user } = useAuth();
   const [messages, setMessages] = useState<any[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const chatId = route.params.chatId;
+  const friendDeviceToken = route.params.friendDeviceToken;
+  const friendName = route.params.friendName;
 
   useEffect(() => {
     const unsubscribe = firestore()
@@ -47,6 +50,16 @@ const ChatScreen: React.FC = ({ route }: any) => {
           senderName: user.name,
           timestamp: firestore.FieldValue.serverTimestamp(),
         });
+
+      // Send notification to the recipient
+      await sendCustomPushNotification(
+        friendDeviceToken,
+        friendName,
+        newMessage,
+        chatId,
+        user.photo
+      );
+
       setNewMessage('');
     }
   };

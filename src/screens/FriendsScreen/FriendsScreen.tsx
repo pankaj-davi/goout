@@ -17,7 +17,8 @@ const FriendsScreen: React.FC = () => {
   const handleFriendPress = (
     friendUid: string,
     friendName: string,
-    friendImage: string
+    friendImage: string,
+    friendDeviceToken: string
   ) => {
     const chatId = [currentUserId, friendUid].sort().join('_');
     //@ts-ignore
@@ -25,12 +26,15 @@ const FriendsScreen: React.FC = () => {
       chatId,
       friendImage: friendImage,
       friendName: friendName,
+      friendDeviceToken: friendDeviceToken,
     });
   };
 
   const renderItem = ({ item }: { item: IUser }) => (
     <TouchableOpacity
-      onPress={() => handleFriendPress(item.uid, item.name, item.photo)}
+      onPress={() =>
+        handleFriendPress(item.uid, item.name, item.photo, item.deviceToken)
+      }
       style={styles.friendItem}
     >
       <Image source={{ uri: item.photo }} style={styles.icon} />

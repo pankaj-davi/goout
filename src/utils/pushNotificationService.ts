@@ -1,6 +1,15 @@
 // src/utils/pushNotificationService.ts
-import PushNotification from 'react-native-push-notification';
+import PushNotification, {
+  ReceivedNotification,
+} from 'react-native-push-notification';
 import messaging from '@react-native-firebase/messaging';
+import { NavigationContainerRef } from '@react-navigation/native';
+
+let navigationRef: NavigationContainerRef<any> | null = null;
+
+export const setNavigationRef = (ref: NavigationContainerRef<any>) => {
+  navigationRef = ref;
+};
 
 // Function to create a notification channel (Android only)
 export const createNotificationChannel = () => {
@@ -40,6 +49,7 @@ export const setupForegroundNotificationHandler = () => {
       playSound: true,
       soundName: 'gooutsound',
       largeIconUrl: imageUrl, // Include the image URL if available
+      userInfo: { chatId: remoteMessage.data?.chatId },
     });
   });
 };
@@ -66,14 +76,31 @@ export const setupBackgroundNotificationHandler = () => {
       playSound: true,
       soundName: 'gooutsound',
       largeIconUrl: imageUrl, // Include the image URL if available
+      userInfo: { chatId: remoteMessage.data?.chatId },
     });
   });
 };
+
+interface CustomNotification extends Omit<ReceivedNotification, 'userInfo'> {
+  userInfo?: { chatId?: string };
+}
+
+PushNotification.configure({
+  onNotification: function (notification: CustomNotification) {
+    if (notification.userInteraction && notification.userInfo?.chatId) {
+      const chatId = notification.userInfo.chatId;
+      if (navigationRef) {
+        navigationRef.navigate('ChatScreen', { chatId });
+      }
+    }
+  },
+});
 
 export const sendCustomPushNotification = async (
   deviceToken: string,
   title: string,
   body: string,
+  chatId: string,
   imageUrl?: string // Optional image URL
 ) => {
   try {

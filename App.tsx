@@ -1,6 +1,9 @@
 import React, { useEffect } from 'react';
 import { ThemeProvider } from './src/components/ThemeProvider';
-import { NavigationContainer } from '@react-navigation/native';
+import {
+  NavigationContainer,
+  NavigationContainerRef,
+} from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import {
@@ -28,6 +31,7 @@ import {
   createNotificationChannel,
   setupForegroundNotificationHandler,
   setupBackgroundNotificationHandler,
+  setNavigationRef,
 } from './src/utils/pushNotificationService';
 
 const Tab = createBottomTabNavigator();
@@ -58,6 +62,7 @@ const ChatHeader = ({ route }: { route: any }) => {
   const { friendName = 'Unknown', friendImage = '' } = route.params as {
     friendName?: string;
     friendImage?: string;
+    friendDeviceToken?: string;
   };
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -187,7 +192,9 @@ const MainApp = () => {
   }
 
   return (
-    <NavigationContainer>
+    <NavigationContainer
+      ref={(ref) => setNavigationRef(ref as NavigationContainerRef<any>)}
+    >
       <StackNavigator />
     </NavigationContainer>
   );
