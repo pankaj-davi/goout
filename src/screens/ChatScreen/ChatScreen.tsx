@@ -1,17 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, memo } from 'react';
 import {
-  FlatList,
   View,
+  FlatList,
   TextInput,
-  StyleSheet,
   TouchableOpacity,
+  StyleSheet,
 } from 'react-native';
+import { useAuth } from '../../context/AuthContext';
 import firestore from '@react-native-firebase/firestore';
-import ChatMessage from './../../components/ChatMessage/ChatMessage';
-import { useAuth } from '../../../src/context/AuthContext';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { theme } from '../../theme/index';
+import ChatMessage from '../../components/ChatMessage/ChatMessage';
 import { sendCustomPushNotification } from '../../utils/pushNotificationService';
+import { theme } from '../../theme/index';
+
+// Memoize the ChatMessage component
+const MemoizedChatMessage = memo(ChatMessage);
 
 const ChatScreen: React.FC = ({ route, navigation }: any) => {
   const { user } = useAuth();
@@ -20,6 +23,7 @@ const ChatScreen: React.FC = ({ route, navigation }: any) => {
   const chatId = route.params.chatId;
   const friendDeviceToken = route.params.friendDeviceToken;
   const friendName = route.params.friendName;
+  const flatListRef = useRef<FlatList>(null);
 
   useEffect(() => {
     const unsubscribe = firestore()
@@ -33,6 +37,7 @@ const ChatScreen: React.FC = ({ route, navigation }: any) => {
           ...doc.data(),
         }));
         setMessages(messages);
+        flatListRef.current?.scrollToEnd({ animated: true });
       });
     return () => unsubscribe();
   }, [chatId]);
@@ -51,8 +56,8 @@ const ChatScreen: React.FC = ({ route, navigation }: any) => {
           timestamp: firestore.FieldValue.serverTimestamp(),
         });
 
-      // Send notification to the recipient
-      await sendCustomPushNotification(
+      // Send notification to the recipient in the background
+      sendCustomPushNotification(
         friendDeviceToken,
         friendName,
         newMessage,
@@ -64,15 +69,24 @@ const ChatScreen: React.FC = ({ route, navigation }: any) => {
     }
   };
 
+  const keyExtractor = (item: any) => item.id;
+
+  const getItemLayout = (data: any, index: number) => ({
+    length: 70, // Approximate height of each item
+    offset: 70 * index,
+    index,
+  });
+
   return (
     <View style={styles.container}>
       {user && (
         <>
           <FlatList
+            ref={flatListRef}
             data={messages}
-            keyExtractor={(item) => item.id}
+            keyExtractor={keyExtractor}
             renderItem={({ item }) => (
-              <ChatMessage
+              <MemoizedChatMessage
                 senderName={item.senderName}
                 message={item.message}
                 timestamp={
@@ -81,6 +95,13 @@ const ChatScreen: React.FC = ({ route, navigation }: any) => {
                 isCurrentUser={item.sender === user.uid}
               />
             )}
+            getItemLayout={getItemLayout}
+            onContentSizeChange={() =>
+              flatListRef.current?.scrollToEnd({ animated: true })
+            }
+            onLayout={() =>
+              flatListRef.current?.scrollToEnd({ animated: false })
+            }
           />
           <View style={styles.inputContainer}>
             <TextInput
@@ -117,20 +138,20 @@ const styles = StyleSheet.create({
   },
   input: {
     width: '100%',
-    minHeight: 50, // Minimum height
-    maxHeight: 150, // Optional: Limit the height
+    minHeight: 50,
+    maxHeight: 150,
     borderColor: theme.colors.border,
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 10,
     color: theme.colors.text,
     backgroundColor: '#fff',
-    textAlignVertical: 'top', // Align text to the top
+    textAlignVertical: 'top',
   },
   iconContainer: {
     position: 'absolute',
-    right: 15, // Place icon inside the input on the right
-    top: '55%', // Vertically center the icon
+    right: 15,
+    top: '55%',
     transform: [{ translateY: -15 }],
   },
 });
