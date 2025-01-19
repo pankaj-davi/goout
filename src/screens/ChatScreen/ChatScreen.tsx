@@ -250,24 +250,39 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
 
   const renderInputToolbar = () => (
     <View style={styles.inputContainer}>
-      <TouchableOpacity style={styles.fileButton} onPress={handleFilePick}>
-        <Icon name="attach" size={30} color={theme.colors.primary} />
-      </TouchableOpacity>
-      <TextInput
-        style={styles.input}
-        value={newMessage}
-        onChangeText={setNewMessage}
-        placeholder="Type a message"
-        placeholderTextColor={theme.colors.text}
-        multiline
-        returnKeyType="default"
-      />
       {selectedFile && (
-        <Image source={{ uri: selectedFile.uri }} style={styles.filePreview} />
+        <View style={styles.filePreviewContainer}>
+          <View style={styles.imageWrapper}>
+            <Image
+              source={{ uri: selectedFile.uri }}
+              style={styles.filePreview}
+            />
+            <TouchableOpacity
+              style={styles.closeIconContainer}
+              onPress={() => setSelectedFile(null)}
+            >
+              <Icon name="close" size={20} color={theme.colors.primary} />
+            </TouchableOpacity>
+          </View>
+        </View>
       )}
-      <TouchableOpacity style={styles.iconContainer} onPress={sendMessage}>
-        <Icon name="send" size={25} color={theme.colors.primary} />
-      </TouchableOpacity>
+      <View style={styles.inputRow}>
+        <TouchableOpacity style={styles.fileButton} onPress={handleFilePick}>
+          <Icon name="attach" size={30} color={theme.colors.primary} />
+        </TouchableOpacity>
+        <TextInput
+          style={styles.input}
+          value={newMessage}
+          onChangeText={setNewMessage}
+          placeholder="Type a message"
+          placeholderTextColor={theme.colors.text}
+          multiline
+          returnKeyType="default"
+        />
+        <TouchableOpacity style={styles.iconContainer} onPress={sendMessage}>
+          <Icon name="send" size={25} color={theme.colors.primary} />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 
@@ -318,11 +333,13 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background,
   },
   inputContainer: {
+    paddingHorizontal: 10,
+    backgroundColor: theme.colors.background,
+  },
+  inputRow: {
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 10,
-    paddingHorizontal: 10,
-    backgroundColor: theme.colors.background,
   },
   input: {
     flex: 1,
@@ -339,13 +356,46 @@ const styles = StyleSheet.create({
   fileButton: {
     marginRight: 10,
   },
+  filePreviewContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  imageWrapper: {
+    position: 'relative',
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+    borderColor: theme.colors.border,
+    borderWidth: 2,
+    marginRight: 10,
+  },
   filePreview: {
-    width: 50,
-    height: 50,
-    marginLeft: 10,
+    width: '100%',
+    height: '100%',
+    borderRadius: 8,
+  },
+  closeIconContainer: {
+    position: 'absolute',
+    top: 2,
+    right: 2,
+    backgroundColor: theme.colors.background,
+    borderColor: theme.colors.border,
+    borderWidth: 1,
+    borderRadius: 15,
+    padding: 1,
+    cursor: 'pointer',
   },
   iconContainer: {
     marginLeft: 10,
+  },
+  filePreviewInsideInput: {
+    width: 50,
+    height: 50,
+    position: 'absolute',
+    top: 5,
+    left: 5,
+    borderRadius: 8,
   },
 });
 
