@@ -4414,6 +4414,7 @@ __metadata:
     react-native-svg-transformer: ^1.5.0
     react-native-tab-view: ^3.5.2
     react-native-vector-icons: ^10.2.0
+    react-native-video: ^6.10.0
     react-test-renderer: 18.3.1
     styled-components: ^5.3.10
     typescript: ^5.6.2
@@ -9519,6 +9520,16 @@ __metadata:
     fa6-upgrade: bin/fa6-upgrade.sh
     generate-icon: bin/generate-icon.js
   checksum: fda930df4e63f12533268f5b339ebe4c77c691eae43503328466b3087ed868a06a4593fd246e75ac6b5ec955543eec35608c7922191bdcc3b3a94ed7f3575ef0
+  languageName: node
+  linkType: hard
+
+"react-native-video@npm:^6.10.0":
+  version: 6.10.0
+  resolution: "react-native-video@npm:6.10.0"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: 6752e0d30bcb7e2c36861eacd8528e286b4831d1cdc6e903390e1ff361574816bad3c6a7ff0166546fa90386d71132f1e52a7d3ec93ecdb33f9413bee668f450
   languageName: node
   linkType: hard
 

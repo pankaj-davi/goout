@@ -8,6 +8,7 @@ import {
   Image,
   Alert,
   Linking,
+  Modal,
 } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
 import firestore from '@react-native-firebase/firestore';
@@ -32,11 +33,11 @@ interface ChatScreenProps {
 }
 
 interface CustomMessage extends IMessage {
-  file?: {
+  files?: {
     url: string;
     name: string;
     type: string;
-  };
+  }[];
 }
 
 // Define the file type
@@ -53,6 +54,8 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
   const [messages, setMessages] = useState<CustomMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [selectedFiles, setSelectedFiles] = useState<SelectedFile[]>([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const { chatId, friendDeviceToken, friendName } = route.params;
 
   useEffect(() => {
@@ -73,7 +76,7 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
               name: firebaseData.senderName,
               avatar: user?.photo || '',
             },
-            image: firebaseData.files?.[0]?.url, // Add this line to handle image preview
+            image: firebaseData.files?.map((file: { url: string }) => file.url), // Update this line to handle multiple images
             file: firebaseData.file,
           } as CustomMessage;
         });
@@ -125,10 +128,15 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
   const onSend = useCallback(
     async (messages: CustomMessage[] = []) => {
       const { text } = messages[0];
-      let fileData = null;
+      let fileData: { url: string; name: string; type: string }[] | undefined =
+        undefined;
 
       if (selectedFiles.length > 0) {
-        fileData = await uploadFiles(selectedFiles);
+        fileData = (await uploadFiles(selectedFiles)) as {
+          url: string;
+          name: string;
+          type: string;
+        }[];
       }
 
       try {
@@ -163,8 +171,8 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
               },
               createdAt: new Date(),
               _id: Math.random().toString(),
-              files: fileData as any,
-              images: fileData?.map((file) => file.url),
+              files: fileData,
+              image: fileData?.length ? fileData[0].url : undefined,
             },
           ])
         );
@@ -197,7 +205,16 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
       });
 
       if (result) {
-        setSelectedFiles((prevFiles) => [...prevFiles, result]);
+        setSelectedFiles((prevFiles) => [
+          ...prevFiles,
+          {
+            fileCopyUri: result.fileCopyUri || '',
+            name: result.name,
+            size: result.size,
+            type: result.type,
+            uri: result.uri,
+          } as SelectedFile,
+        ]);
       }
     } catch (error) {
       if (!DocumentPicker.isCancel(error)) {
@@ -300,6 +317,11 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
     </View>
   );
 
+  const handleImagePress = (imgUrl: string) => {
+    setSelectedImage(imgUrl);
+    setModalVisible(true);
+  };
+
   if (!user) {
     return null;
   }
@@ -333,10 +355,50 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
                 color: theme.colors.messageTextOwn,
               },
             }}
+            renderMessageImage={(props) => {
+              return (
+                <View style={{ padding: 5 }}>
+                  {Array.isArray(props.currentMessage.image) &&
+                    props.currentMessage.image.map((imgUrl, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        onPress={() => handleImagePress(imgUrl)}
+                      >
+                        <Image
+                          source={{ uri: imgUrl }}
+                          style={{
+                            width: 200,
+                            height: 200,
+                            borderRadius: 10,
+                            marginBottom: 5,
+                          }}
+                        />
+                      </TouchableOpacity>
+                    ))}
+                </View>
+              );
+            }}
           />
         )}
         renderInputToolbar={renderInputToolbar}
       />
+      {selectedImage && (
+        <Modal
+          visible={modalVisible}
+          transparent={true}
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <View style={styles.modalContainer}>
+            <TouchableOpacity
+              style={styles.modalCloseButton}
+              onPress={() => setModalVisible(false)}
+            >
+              <Icon name="close" size={30} color="#fff" />
+            </TouchableOpacity>
+            <Image source={{ uri: selectedImage }} style={styles.modalImage} />
+          </View>
+        </Modal>
+      )}
     </View>
   );
 };
@@ -410,6 +472,23 @@ const styles = StyleSheet.create({
     top: 5,
     left: 5,
     borderRadius: 8,
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalImage: {
+    width: '90%',
+    height: '70%',
+    resizeMode: 'contain',
+  },
+  modalCloseButton: {
+    position: 'absolute',
+    top: 40,
+    right: 20,
+    zIndex: 1,
   },
 });
 
