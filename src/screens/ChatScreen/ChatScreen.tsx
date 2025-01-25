@@ -227,9 +227,16 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
   const sendMessage = async () => {
     if (newMessage.trim() === '' && selectedFiles.length === 0) return;
 
+    const messageToSend = newMessage;
+    const filesToSend = selectedFiles;
+
+    // Clear the input and selected files immediately
+    setNewMessage('');
+    setSelectedFiles([]);
+
     let fileData = null;
-    if (selectedFiles.length > 0) {
-      fileData = await uploadFiles(selectedFiles);
+    if (filesToSend.length > 0) {
+      fileData = await uploadFiles(filesToSend);
     }
 
     try {
@@ -238,7 +245,7 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
         .doc(chatId)
         .collection('messages')
         .add({
-          message: newMessage,
+          message: messageToSend,
           sender: user?.uid,
           senderName: user?.name,
           timestamp: firestore.FieldValue.serverTimestamp(),
@@ -248,14 +255,14 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
       await sendCustomPushNotification(
         friendDeviceToken,
         friendName,
-        newMessage,
+        messageToSend,
         user?.photo || ''
       );
 
       setMessages((previousMessages) =>
         GiftedChat.append(previousMessages, [
           {
-            text: newMessage,
+            text: messageToSend,
             user: {
               _id: user?.uid || '',
               name: user?.name || '',
@@ -267,8 +274,6 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
           },
         ])
       );
-      setSelectedFiles([]);
-      setNewMessage('');
     } catch (error) {
       console.error('Error saving message to Firestore:', error);
     }
