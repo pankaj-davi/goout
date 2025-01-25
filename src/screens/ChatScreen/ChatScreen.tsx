@@ -52,7 +52,7 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
   const { user } = useAuth();
   const [messages, setMessages] = useState<CustomMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
-  const [selectedFile, setSelectedFile] = useState<any>(null);
+  const [selectedFiles, setSelectedFiles] = useState<SelectedFile[]>([]);
   const { chatId, friendDeviceToken, friendName } = route.params;
 
   useEffect(() => {
@@ -73,7 +73,7 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
               name: firebaseData.senderName,
               avatar: user?.photo || '',
             },
-            image: firebaseData.image,
+            image: firebaseData.files?.[0]?.url, // Add this line to handle image preview
             file: firebaseData.file,
           } as CustomMessage;
         });
@@ -111,13 +111,24 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
     }
   };
 
+  const uploadFiles = async (files: SelectedFile[]) => {
+    const uploadedFiles = [];
+    for (const file of files) {
+      const uploadedFile = await uploadFile(file);
+      if (uploadedFile) {
+        uploadedFiles.push(uploadedFile);
+      }
+    }
+    return uploadedFiles;
+  };
+
   const onSend = useCallback(
     async (messages: CustomMessage[] = []) => {
       const { text } = messages[0];
       let fileData = null;
 
-      if (selectedFile) {
-        fileData = await uploadFile(selectedFile as SelectedFile);
+      if (selectedFiles.length > 0) {
+        fileData = await uploadFiles(selectedFiles);
       }
 
       try {
@@ -130,7 +141,7 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
             sender: user?.uid,
             senderName: user?.name,
             timestamp: firestore.FieldValue.serverTimestamp(),
-            file: fileData || undefined,
+            files: fileData || undefined,
           });
 
         await sendCustomPushNotification(
@@ -152,17 +163,17 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
               },
               createdAt: new Date(),
               _id: Math.random().toString(),
-              file: fileData as any,
-              image: fileData?.url,
+              files: fileData as any,
+              images: fileData?.map((file) => file.url),
             },
           ])
         );
-        setSelectedFile(null);
+        setSelectedFiles([]);
       } catch (error) {
         console.error('Error saving message to Firestore:', error);
       }
     },
-    [selectedFile, chatId, friendDeviceToken, friendName]
+    [selectedFiles, chatId, friendDeviceToken, friendName]
   );
 
   const handleFilePick = async () => {
@@ -186,7 +197,7 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
       });
 
       if (result) {
-        setSelectedFile(result);
+        setSelectedFiles((prevFiles) => [...prevFiles, result]);
       }
     } catch (error) {
       if (!DocumentPicker.isCancel(error)) {
@@ -198,11 +209,11 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
   };
 
   const sendMessage = async () => {
-    if (newMessage.trim() === '' && !selectedFile) return;
+    if (newMessage.trim() === '' && selectedFiles.length === 0) return;
 
     let fileData = null;
-    if (selectedFile) {
-      fileData = await uploadFile(selectedFile as SelectedFile);
+    if (selectedFiles.length > 0) {
+      fileData = await uploadFiles(selectedFiles);
     }
 
     try {
@@ -215,7 +226,7 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
           sender: user?.uid,
           senderName: user?.name,
           timestamp: firestore.FieldValue.serverTimestamp(),
-          file: fileData,
+          files: fileData,
         });
 
       await sendCustomPushNotification(
@@ -237,11 +248,11 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
             },
             createdAt: new Date(),
             _id: Math.random().toString(),
-            file: fileData,
+            files: fileData,
           },
         ])
       );
-      setSelectedFile(null);
+      setSelectedFiles([]);
       setNewMessage('');
     } catch (error) {
       console.error('Error saving message to Firestore:', error);
@@ -250,20 +261,23 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
 
   const renderInputToolbar = () => (
     <View style={styles.inputContainer}>
-      {selectedFile && (
+      {selectedFiles.length > 0 && (
         <View style={styles.filePreviewContainer}>
-          <View style={styles.imageWrapper}>
-            <Image
-              source={{ uri: selectedFile.uri }}
-              style={styles.filePreview}
-            />
-            <TouchableOpacity
-              style={styles.closeIconContainer}
-              onPress={() => setSelectedFile(null)}
-            >
-              <Icon name="close" size={20} color={theme.colors.primary} />
-            </TouchableOpacity>
-          </View>
+          {selectedFiles.map((file, index) => (
+            <View key={index} style={styles.imageWrapper}>
+              <Image source={{ uri: file.uri }} style={styles.filePreview} />
+              <TouchableOpacity
+                style={styles.closeIconContainer}
+                onPress={() =>
+                  setSelectedFiles((prevFiles) =>
+                    prevFiles.filter((_, i) => i !== index)
+                  )
+                }
+              >
+                <Icon name="close" size={20} color={theme.colors.primary} />
+              </TouchableOpacity>
+            </View>
+          ))}
         </View>
       )}
       <View style={styles.inputRow}>
