@@ -156,7 +156,6 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
           friendDeviceToken,
           friendName,
           text,
-          chatId,
           user?.photo || ''
         );
 
@@ -250,7 +249,6 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
         friendDeviceToken,
         friendName,
         newMessage,
-        chatId,
         user?.photo || ''
       );
 

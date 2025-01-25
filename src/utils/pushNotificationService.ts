@@ -100,7 +100,6 @@ export const sendCustomPushNotification = async (
   deviceToken: string,
   title: string,
   body: string,
-  chatId: string,
   imageUrl?: string // Optional image URL
 ) => {
   try {
